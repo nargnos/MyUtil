@@ -9,7 +9,7 @@ namespace Csv
 	{
 		
 		internal CsvTable Father { get; set; }
-		internal CsvRow()
+		public CsvRow()
 		{ }
 		public CsvRow(List<string> row)
 		{

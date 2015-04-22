@@ -8,7 +8,7 @@ namespace Csv
 {
     public partial class CsvTable
     {
-        private static readonly int[,] statMap =
+        private static readonly int[,] statusMap =
         {
             {4,2,0,1,7},
             {1,2,3,1,7},
@@ -19,7 +19,7 @@ namespace Csv
             {5,2,3,8,7}
         };
 
-        private static readonly Dictionary<char, int> condition = new Dictionary<char, int>()
+        private static readonly Dictionary<char, int> conditions = new Dictionary<char, int>()
         {
             {'"', 0},
             {',', 1},
@@ -58,14 +58,14 @@ namespace Csv
                 if (index < data.Length)
                 {
                     cr = data[index++];
-                    tmpCondition = condition.ContainsKey(cr) ? condition[cr] : 3;
+                    tmpCondition = conditions.ContainsKey(cr) ? conditions[cr] : 3;
                 }
                 else
                 {
                     tmpCondition = 4;
                 }
                 var preStat = stat;
-                stat = statMap[stat, tmpCondition];
+                stat = statusMap[stat, tmpCondition];
                 // 处理stat
                 actionTable[stat](table, ref tmpRow, tmpField, cr, preStat);
             }
@@ -105,9 +105,9 @@ namespace Csv
         {
 			if (preStat == 0 || preStat == 3) return;
 			tmpRow.Add(tmpField.ToString());
-			// 项读取完毕,另一个状态
+			// 项读取完毕(另一个状态)
 			table.Add(tmpRow);
-			// 行读取完毕,另一个状态
+			// 行读取完毕(另一个状态)
         }
 
 		private static void Function8(List<CsvRow> table, ref CsvRow tmpRow, StringBuilder tmpField, char cr, int preStat)
