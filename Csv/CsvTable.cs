@@ -94,6 +94,14 @@ namespace Csv
                 }
                 return this[index][tmpIndex];
             }
+            set {
+                var tmpIndex = FindHeader(colName);
+                if (tmpIndex < 0)
+                {
+                    throw new ArgumentException("找不到该列");
+                }
+                this[index][tmpIndex] = value;
+            }
         }
 
         /// <summary>
@@ -105,6 +113,7 @@ namespace Csv
         public string this[int row, int col]
         {
             get { return table[row][col]; }
+            set { table[row][col] = value; }
         }
 
         /// <summary>
