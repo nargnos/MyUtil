@@ -21,7 +21,7 @@ namespace Csv
     public partial class CsvTable: IEnumerable<CsvRow>
     {
         private readonly bool hasHeader;
-        private readonly Dictionary<string, int> headerIndexs = new Dictionary<string, int>();
+        // private readonly Dictionary<string, int> headerIndexs = new Dictionary<string, int>();
         private readonly List<CsvRow> table;
 
         public CsvTable(List<CsvRow> table, bool hasHeader)
@@ -153,19 +153,20 @@ namespace Csv
             {
                 throw new ArgumentException("该表没有表头");
             }
-            if (!headerIndexs.ContainsKey(colName))
-            {
-                var tmpIndex = Header.IndexOf(colName);
-                if (tmpIndex >= 0)
-                {
-                    headerIndexs.Add(colName, tmpIndex);
-                }
-                else
-                {
-                    return tmpIndex;
-                }
-            }
-            return headerIndexs[colName];
+            return Header.IndexOf(colName); ;
+            //if (!headerIndexs.ContainsKey(colName))
+            //{
+            //    var tmpIndex = Header.IndexOf(colName);
+            //    if (tmpIndex >= 0)
+            //    {
+            //        headerIndexs.Add(colName, tmpIndex);
+            //    }
+            //    else
+            //    {
+            //        return tmpIndex;
+            //    }
+            //}
+            //return headerIndexs[colName];
         }
 
         public string GetField(int rowIndex, string colName)
