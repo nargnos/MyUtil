@@ -154,19 +154,6 @@ namespace Csv
                 throw new ArgumentException("该表没有表头");
             }
             return Header.IndexOf(colName); ;
-            //if (!headerIndexs.ContainsKey(colName))
-            //{
-            //    var tmpIndex = Header.IndexOf(colName);
-            //    if (tmpIndex >= 0)
-            //    {
-            //        headerIndexs.Add(colName, tmpIndex);
-            //    }
-            //    else
-            //    {
-            //        return tmpIndex;
-            //    }
-            //}
-            //return headerIndexs[colName];
         }
 
         public string GetField(int rowIndex, string colName)
