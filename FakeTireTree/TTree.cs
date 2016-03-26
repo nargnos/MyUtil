@@ -1,4 +1,5 @@
 ﻿// 项目需要,修改了tire树的一些结构用来存一些东西,所以实现上有点靠项目需求
+// FIX: 线程不安全+性能不高
 using System;
 using System.Collections.Generic;
 using System.Linq;
