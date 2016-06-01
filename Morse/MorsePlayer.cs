@@ -16,6 +16,7 @@ namespace Morse
         public char ShortGapChar { get { return morseConverter.ShortGapChar; } set { morseConverter.ShortGapChar = value; } }
         public int Hz { get; set; } = 1000;
         public int Duration { get; set; } = 120;
+        public Action<int, int> Beep { get; set; } = Console.Beep;
 
         private Action onDit;
         private Action onDah;
@@ -24,8 +25,8 @@ namespace Morse
 
         public MorsePlayer()
         {
-            onDit = () => Console.Beep(Hz, Duration);
-            onDah = () => Console.Beep(Hz, 3 * Duration);
+            onDit = () => Beep(Hz, Duration);
+            onDah = () => Beep(Hz, 3 * Duration);
             onShortGap = () => Thread.Sleep(3 * Duration);
             onMediumGap = () => Thread.Sleep(7 * Duration);
 
