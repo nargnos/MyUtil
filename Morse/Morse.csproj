@@ -44,12 +44,6 @@
     <Compile Include="MorsePlayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FakeTireTree\FakeTireTree.csproj">
-      <Project>{a43748f0-989f-47ab-99a6-2c048215a530}</Project>
-      <Name>FakeTireTree</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

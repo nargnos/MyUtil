@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TireTree;
 namespace Morse
 {
     public class MorseConverter
@@ -70,21 +69,32 @@ namespace Morse
                     {'(', new bool[] {false,true,false,false,true}},
                     {')', new bool[] {false,true,false,false,true,false,}},
 
-                    {' ', null }
+                    {' ', new bool[] { } }
                 };
             }, true);
 
-        private static Lazy<TTree<bool, char>> morseTree = new Lazy<TTree<bool, char>>(
-            () =>
+        private class BoolArrayComparer : IEqualityComparer<bool[]>
+        {
+            public bool Equals(bool[] x, bool[] y)
             {
-                var result = new TTree<bool, char>();
-                foreach (var item in from x in alphabet.Value where x.Value != null select x)
-                {
-                    result.Add(item.Value, item.Key);
-                }
+                return x.SequenceEqual(y);
+            }
 
+            public int GetHashCode(bool[] obj)
+            {
+                int result = obj.Length << 1;
+                foreach (var item in obj)
+                {
+                    result = result << 1 | (item ? 1 : 0);
+                }
                 return result;
-            }, true);
+            }
+        }
+        private static Lazy<Dictionary<bool[], char>> morseMap = new Lazy<Dictionary<bool[], char>>(
+            () => alphabet.Value.ToDictionary(
+                (pair) => pair.Value,
+                (pair) => pair.Key, new BoolArrayComparer()), true);
+
         private const int ByteHexStrLen = 2;
         public char DitChar { get; set; } = '·';
         public char DahChar { get; set; } = '−';
@@ -108,6 +118,7 @@ namespace Morse
                 e();
             }
         }
+
         // 2间隔区分词，1间隔区分字
         public string MorseToAscii(string line)
         {
@@ -115,16 +126,16 @@ namespace Morse
             {
                 return string.Empty;
             }
-            var tree = morseTree.Value;
+            var morse = morseMap.Value;
             // FIX: 使用分割字符串方式性能不高
             var morseArray = from word in line.Split(new string[] { MediumGapString }, StringSplitOptions.RemoveEmptyEntries)
                              select
                              from chr in word.Split(ShortGapChar)
                              select
-                             from morseCode in chr
-                             where morseCode == DitChar || morseCode == DahChar
-                             let isDit = (morseCode == DitChar ? true : false)
-                             select isDit;
+                             (from morseCode in chr
+                              where morseCode == DitChar || morseCode == DahChar
+                              let isDit = (morseCode == DitChar ? true : false)
+                              select isDit).ToArray();
 
 
             StringBuilder sb = new StringBuilder();
@@ -132,10 +143,9 @@ namespace Morse
             {
                 foreach (var chr in word)
                 {
-                    var tmpNode = tree.FindNode(chr);
-                    if (tmpNode != null && tmpNode.HasValue)
+                    if (morse.ContainsKey(chr))
                     {
-                        sb.Append(tmpNode.Value);
+                        sb.Append(morse[chr]);
                     }
                 }
                 sb.Append(ShortGapChar);
@@ -156,7 +166,7 @@ namespace Morse
             StringBuilder sb = new StringBuilder();
             foreach (var morse in morseArray)
             {
-                if (morse == null)
+                if (morse == null || !morse.Any())
                 {
                     OnEvent(MediumGap);
                 }
@@ -207,7 +217,7 @@ namespace Morse
                 }
                 catch (Exception)
                 {
-                }                
+                }
             }
             return result;
         }
