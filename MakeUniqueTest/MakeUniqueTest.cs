@@ -115,6 +115,17 @@ namespace MakeUniqueTest
             }
         }
 
+        [TestMethod]
+        public void LinkTest()
+        {
+            string path = @"..\..\TestFile\";
+            string target = Path.Combine(path, "LinkTest.txt");
+            string hlFile = Path.Combine(path, "HardLink.txt");
+            bool r = FileUtils.CreateHardLink(hlFile, target);
+            Assert.IsTrue(r);
+            File.Delete(hlFile);
+        }
+
 
         private static void GetFiles(IFileInfoReader reader, DuplicateFileFinder finder)
         {

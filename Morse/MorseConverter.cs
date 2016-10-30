@@ -113,10 +113,7 @@ namespace Morse
         public event Action MediumGap;
         private void OnEvent(Action e)
         {
-            if (e != null)
-            {
-                e();
-            }
+            e?.Invoke();
         }
 
         // 2间隔区分词，1间隔区分字

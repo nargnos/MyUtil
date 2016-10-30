@@ -135,8 +135,7 @@ namespace MakeUnique
             {
                 foreach (var item in del)
                 {
-                    Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(
-                        item.Text, Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs, Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+                    FileUtils.DeleteFile(item.Text, false, true);
                     StepProgess();
                 }
             });

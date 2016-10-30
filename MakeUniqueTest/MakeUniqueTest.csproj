@@ -72,7 +72,7 @@
     <Content Include="TestFile\dir\同内容2.txt" />
     <Content Include="TestFile\dir\同名.txt" />
     <Content Include="TestFile\dir\同名同内容.txt" />
-    <Content Include="TestFile\同内容.txt" />
+    <Content Include="TestFile\不同名同内容.txt" />
     <Content Include="TestFile\同名.txt" />
     <Content Include="TestFile\同名同内容.txt" />
   </ItemGroup>

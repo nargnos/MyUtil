@@ -62,8 +62,8 @@
             this.toolStripButton_Search = new System.Windows.Forms.ToolStripButton();
             this.toolStripTextBox_Search = new System.Windows.Forms.ToolStripTextBox();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
-            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
+            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -87,7 +87,7 @@
             this.listView_DupFiles.Location = new System.Drawing.Point(3, 30);
             this.listView_DupFiles.Name = "listView_DupFiles";
             this.listView_DupFiles.ShowItemToolTips = true;
-            this.listView_DupFiles.Size = new System.Drawing.Size(873, 526);
+            this.listView_DupFiles.Size = new System.Drawing.Size(873, 528);
             this.listView_DupFiles.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.listView_DupFiles.TabIndex = 3;
             this.listView_DupFiles.UseCompatibleStateImageBehavior = false;
@@ -115,7 +115,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.tableLayoutPanel2);
             this.splitContainer1.Panel2MinSize = 450;
-            this.splitContainer1.Size = new System.Drawing.Size(1281, 559);
+            this.splitContainer1.Size = new System.Drawing.Size(1281, 561);
             this.splitContainer1.SplitterDistance = 400;
             this.splitContainer1.SplitterWidth = 2;
             this.splitContainer1.TabIndex = 9;
@@ -133,7 +133,7 @@
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(400, 559);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(400, 561);
             this.tableLayoutPanel1.TabIndex = 1;
             // 
             // toolStrip_Dir
@@ -227,21 +227,21 @@
             // ToolStripMenuItem_FindSameName
             // 
             this.ToolStripMenuItem_FindSameName.Name = "ToolStripMenuItem_FindSameName";
-            this.ToolStripMenuItem_FindSameName.Size = new System.Drawing.Size(181, 26);
+            this.ToolStripMenuItem_FindSameName.Size = new System.Drawing.Size(163, 26);
             this.ToolStripMenuItem_FindSameName.Text = "同名文件";
             this.ToolStripMenuItem_FindSameName.Click += new System.EventHandler(this.ToolStripMenuItem_FindSameName_Click);
             // 
             // ToolStripMenuItem_FindSameSize
             // 
             this.ToolStripMenuItem_FindSameSize.Name = "ToolStripMenuItem_FindSameSize";
-            this.ToolStripMenuItem_FindSameSize.Size = new System.Drawing.Size(181, 26);
+            this.ToolStripMenuItem_FindSameSize.Size = new System.Drawing.Size(163, 26);
             this.ToolStripMenuItem_FindSameSize.Text = "同大小文件";
             this.ToolStripMenuItem_FindSameSize.Click += new System.EventHandler(this.ToolStripMenuItem_FindSameSize_Click);
             // 
             // ToolStripMenuItem_FindSameMd5
             // 
             this.ToolStripMenuItem_FindSameMd5.Name = "ToolStripMenuItem_FindSameMd5";
-            this.ToolStripMenuItem_FindSameMd5.Size = new System.Drawing.Size(181, 26);
+            this.ToolStripMenuItem_FindSameMd5.Size = new System.Drawing.Size(163, 26);
             this.ToolStripMenuItem_FindSameMd5.Text = "同Md5文件";
             this.ToolStripMenuItem_FindSameMd5.ToolTipText = "花费时间可能较长";
             this.ToolStripMenuItem_FindSameMd5.Click += new System.EventHandler(this.ToolStripMenuItem_FindSameMd5_Click);
@@ -268,7 +268,7 @@
             this.listView_DirList.Location = new System.Drawing.Point(3, 30);
             this.listView_DirList.Name = "listView_DirList";
             this.listView_DirList.ShowGroups = false;
-            this.listView_DirList.Size = new System.Drawing.Size(394, 526);
+            this.listView_DirList.Size = new System.Drawing.Size(394, 528);
             this.listView_DirList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.listView_DirList.TabIndex = 2;
             this.listView_DirList.UseCompatibleStateImageBehavior = false;
@@ -295,7 +295,7 @@
             this.tableLayoutPanel2.RowCount = 2;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(879, 559);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(879, 561);
             this.tableLayoutPanel2.TabIndex = 4;
             // 
             // toolStrip_File
@@ -423,16 +423,11 @@
             this.statusStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripProgressBar});
-            this.statusStrip.Location = new System.Drawing.Point(0, 559);
+            this.statusStrip.Location = new System.Drawing.Point(0, 561);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(1281, 24);
+            this.statusStrip.Size = new System.Drawing.Size(1281, 22);
             this.statusStrip.TabIndex = 2;
             this.statusStrip.Text = "statusStrip1";
-            // 
-            // folderBrowserDialog
-            // 
-            this.folderBrowserDialog.Description = "选择要查找重复文件的文件夹";
-            this.folderBrowserDialog.ShowNewFolderButton = false;
             // 
             // toolStripProgressBar
             // 
@@ -440,6 +435,11 @@
             this.toolStripProgressBar.Size = new System.Drawing.Size(200, 18);
             this.toolStripProgressBar.Step = 1;
             this.toolStripProgressBar.Visible = false;
+            // 
+            // folderBrowserDialog
+            // 
+            this.folderBrowserDialog.Description = "选择要查找重复文件的文件夹";
+            this.folderBrowserDialog.ShowNewFolderButton = false;
             // 
             // GUI
             // 
