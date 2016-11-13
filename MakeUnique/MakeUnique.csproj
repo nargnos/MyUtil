@@ -76,11 +76,11 @@
     </Compile>
     <Compile Include="Lib\DuplicateFileFinder.cs" />
     <Compile Include="Lib\FileUtils.cs" />
-    <Compile Include="Lib\Reader\FileInfoReaderBase.cs" />
     <Compile Include="Lib\Reader\FileMd5Reader.cs" />
     <Compile Include="Lib\Reader\FileNameReader.cs" />
     <Compile Include="Lib\Reader\FileSizeReader.cs" />
     <Compile Include="Lib\Reader\IFileInfoReader.cs" />
+    <Compile Include="Lib\Reader\GroupingKeyConverter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GUI.resx">

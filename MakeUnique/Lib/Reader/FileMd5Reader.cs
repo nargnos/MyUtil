@@ -6,31 +6,54 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
+using MakeUnique.Lib.Reader;
 
 namespace MakeUnique.Lib
 {
-    public class FileMd5Reader : FileSizeReader
+    public class FileMd5Reader : FileSizeReader, IFileInfoReader
     {
+        protected class MD5KeyComparer : EqualityComparer<byte[]>
+        {
+            public override bool Equals(byte[] x, byte[] y)
+            {
+                if (x == null && y == null)
+                {
+                    return true;
+                }
+                else if (x == null || y == null)
+                {
+                    return false;
+                }
+                return x.SequenceEqual(y);
+            }
 
-        public override string ConvertGroupKey(string key)
+            public override int GetHashCode(byte[] obj)
+            {
+                return obj.Sum((val) => val);
+            }
+        }
+        public new string ConvertGroupKey(string key)
         {
             return $"MD5: {key}";
         }
-        public override ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(ParallelQuery<string> files)
+        public new ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(HashSet<string> files)
         {
-            return (from path in base.GetDuplicateFiles(files).SelectMany((val) => val)
-                    group path by GetMD5(path) into md5Grp
-                    where md5Grp.Count() > 1
-                    select md5Grp).AsUnordered();
+            return (from md5Grp in GroupingFiles(files)
+                   .SelectMany((grp) => grp)
+                   .GroupBy((path) => GetMD5(path), new MD5KeyComparer())
+                   where md5Grp.Count() > 1
+                   select new GroupingKeyConverter<byte[], string, string>(md5Grp, md5ConvertFunc) as IGrouping<string, string>).AsUnordered();
+            
         }
-        protected string GetMD5(string path)
+        public static byte[] GetMD5(string path)
         {
-            using (var file = File.Open(path, FileMode.Open, FileAccess.Read))
+            using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var md5 = new MD5CryptoServiceProvider())
             {
-                var result = md5.ComputeHash(file);
-                return BitConverter.ToString(result).Replace("-", "");
+                return md5.ComputeHash(file);
             }
         }
+        private Func<byte[], string> md5ConvertFunc = (md5) => BitConverter.ToString(md5).Replace("-", string.Empty);
     }
 }

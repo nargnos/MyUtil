@@ -1,6 +1,7 @@
 ﻿using MakeUnique.Lib;
 using MakeUnique.Lib.Detail;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -135,7 +136,14 @@ namespace MakeUnique
             {
                 foreach (var item in del)
                 {
-                    FileUtils.DeleteFile(item.Text, false, true);
+                    try
+                    {
+                        FileUtils.DeleteFile(item.Text, false, true);
+                    }
+                    catch (Exception)
+                    {
+
+                    }
                     StepProgess();
                 }
             });
@@ -216,44 +224,54 @@ namespace MakeUnique
             Text = $"找到 {listView_DupFiles.Groups.Count}个重复，共 {listView_DupFiles.Items.Count} 个文件";
             toolStripProgressBar.Style = ProgressBarStyle.Blocks;
         }
+
         private void AppendResult(ParallelQuery<IGrouping<string, string>> result, IFileInfoReader reader)
         {
-            // FIX: ForAll有一定概率出现并组问题,这里做过lock,还是会出现
-            // 用foreach会慢一些
-            //result.ForAll((item) =>
-            //{;
-            //});
-            foreach (var item in result)
+            ConcurrentBag<ListViewGroup> grpBag = new ConcurrentBag<ListViewGroup>();
+            ConcurrentBag<ListViewItem> itemBag = new ConcurrentBag<ListViewItem>();
+            int x = result.Count();
+            result.ForAll((item) =>
             {
                 var grp = new ListViewGroup(reader.ConvertGroupKey(item.Key));
-                foreach (var path in item)
+
+                foreach (var str in item)
                 {
-                    grp.Items.Add(path);
+                    var listviewItem = new ListViewItem(str, grp);
+                    grp.Items.Add(listviewItem);
+                    itemBag.Add(listviewItem);
                 }
-                AddGroup(grp);
-            }
+                grpBag.Add(grp);
+            });
+            AddGroup(grpBag.ToArray(), itemBag.ToArray());
         }
 
-        private void AddGroup(ListViewGroup grp)
+        private void AddGroup(ListViewGroup[] grpBag, ListViewItem[] itemBag)
         {
-            // 这里可以保证线程安全
+            // FIX: 虚拟模式不能用组吗？这样几千个文件的时候会卡
+            // 这里消耗时间甚至比搜索时间要多,如果不能用组，只能换一种表示方式了
             listView_DupFiles.Invoke(new Action(() =>
             {
-                listView_DupFiles.Items.AddRange(grp.Items);
-                    listView_DupFiles.Groups.Add(grp);                
+                listView_DupFiles.Groups.AddRange(grpBag);
+                //listView_DupFiles.VirtualMode = true;
+                //listView_DupFiles.RetrieveVirtualItem += (sender, e) =>
+                //{
+                //    e.Item = itemBag[e.ItemIndex];
+                //};
+                //listView_DupFiles.VirtualListSize = itemBag.Length;
+                listView_DupFiles.Items.AddRange(itemBag);
             }));
         }
-
-
         private void EndRemove()
         {
             toolStripProgressBar.Visible = false;
+            toolStrip_Dir.Enabled = true;
             toolStrip_File.Enabled = true;
             listView_DupFiles.Enabled = true;
         }
 
         private void BeginRemove()
         {
+            toolStrip_Dir.Enabled = false;
             toolStrip_File.Enabled = false;
             listView_DupFiles.Enabled = false;
             toolStripProgressBar.Visible = true;
@@ -359,5 +377,7 @@ namespace MakeUnique
                 e.Effect = DragDropEffects.Link;
             }
         }
+
+
     }
 }

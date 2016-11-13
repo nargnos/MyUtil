@@ -28,11 +28,15 @@ namespace MakeUnique.Lib
         {
             dirs_.Clear();
         }
-        protected ParallelQuery<string> GetAllFiles(string pattern, SearchOption option)
+        protected IEnumerable<string> GetExistDir()
         {
-            return (from dir in dirs_.AsParallel().AsUnordered()
-                    from file in Directory.EnumerateFiles(dir, pattern, option).AsParallel().AsUnordered()
-                    select file).AsUnordered().Distinct();
+            return (from path in dirs_ where Directory.Exists(path) select path).Distinct();
+        }
+        protected HashSet<string> GetAllFiles(string pattern, SearchOption option)
+        {
+            return new HashSet<string>(from dir in GetExistDir()
+                                       from file in Directory.EnumerateFiles(dir, pattern, option)
+                                       select file);
         }
         public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(string pattern, SearchOption option, IFileInfoReader fileInfoReader)
         {

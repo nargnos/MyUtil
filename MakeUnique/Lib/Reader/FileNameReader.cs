@@ -8,14 +8,22 @@ using System.Threading.Tasks;
 
 namespace MakeUnique.Lib
 {
-    public class FileNameReader : FileInfoReaderBase
+    public class FileNameReader : IFileInfoReader
     {
-        public override string ConvertGroupKey(string key)
+        public string ConvertGroupKey(string key)
         {
             return $"文件名: {key}";
         }
 
-        protected override string GetInfo(string path)
+        public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(HashSet<string> files)
+        {
+            return (from fileName in files.AsParallel()
+                   group fileName by GetFileName(fileName) into grp
+                   where grp.Count() > 1
+                   select grp).AsUnordered();
+        }
+
+        protected string GetFileName(string path)
         {
             return Path.GetFileName(path);
         }

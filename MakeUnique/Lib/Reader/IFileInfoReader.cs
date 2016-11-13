@@ -8,7 +8,7 @@ namespace MakeUnique.Lib.Detail
 {
     public interface IFileInfoReader
     {
-        ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(ParallelQuery<string> files);
+        ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(HashSet<string> files);
         string ConvertGroupKey(string key);
     }
 }
