@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace MakeUnique.Lib.Detail
 {
     public interface IFileInfoReader
     {
-        ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(HashSet<string> files);
+        ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(ParallelQuery<string> files);
         string ConvertGroupKey(string key);
     }
 }

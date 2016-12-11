@@ -1,6 +1,7 @@
 ﻿using MakeUnique.Lib.Detail;
 using MakeUnique.Lib.Reader;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -24,14 +25,14 @@ namespace MakeUnique.Lib
             return $"文件大小: {sb.ToString()}";
         }
 
-        public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(HashSet<string> files)
+        public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(ParallelQuery<string> files)
         {
             return (from grp in GroupingFiles(files)
                    select new GroupingKeyConverter<long, string, string>(grp, keyConvertFunc) as IGrouping<string, string>).AsUnordered();
         }
-        protected ParallelQuery<IGrouping<long, string>> GroupingFiles(HashSet<string> files)
+        protected ParallelQuery<IGrouping<long, string>> GroupingFiles(ParallelQuery<string> files)
         {
-            return (from fileName in files.AsParallel()
+            return (from fileName in files
                     group fileName by GetFileSize(fileName) into grp
                     where grp.Count() > 1
                     select grp).AsUnordered();

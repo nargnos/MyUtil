@@ -15,9 +15,9 @@ namespace MakeUnique.Lib
             return $"文件名: {key}";
         }
 
-        public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(HashSet<string> files)
+        public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(ParallelQuery<string> files)
         {
-            return (from fileName in files.AsParallel()
+            return (from fileName in files
                    group fileName by GetFileName(fileName) into grp
                    where grp.Count() > 1
                    select grp).AsUnordered();

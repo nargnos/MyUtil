@@ -37,7 +37,7 @@ namespace MakeUnique.Lib
         {
             return $"MD5: {key}";
         }
-        public new ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(HashSet<string> files)
+        public new ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(ParallelQuery<string> files)
         {
             return (from md5Grp in GroupingFiles(files)
                    .SelectMany((grp) => grp)

@@ -1,6 +1,7 @@
 ﻿using MakeUnique.Lib;
 using MakeUnique.Lib.Detail;
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -111,6 +112,12 @@ namespace MakeUnique
             ForAllDuplicateGroups((val) => { val.Items[0].Checked = false; }, (val) => { val.Checked = true; });
         }
 
+
+        private bool CheckSelect()
+        {
+            return !listView_DupFiles.Groups.Cast<ListViewGroup>().Any((grp) =>
+                grp.Items.Cast<ListViewItem>().All((item) => item.Checked));
+        }
         private async void toolStripButton_RemoveFile_Click(object sender, EventArgs e)
         {
             // 检查选择项
@@ -123,18 +130,13 @@ namespace MakeUnique
             }
             BeginRemove();
 
-            List<ListViewItem> del = new List<ListViewItem>();
-            ForAllDuplicateGroups(null, (item) =>
+            var del = listView_DupFiles.CheckedItems.Cast<ListViewItem>();
+
+            SetMaxProgress(del.Count());
+
+            foreach (var item in del)
             {
-                if (item.Checked)
-                {
-                    del.Add(item);
-                }
-            });
-            SetMaxProgress(del.Count);
-            await Task.Run(() =>
-            {
-                foreach (var item in del)
+                await Task.Run(() =>
                 {
                     try
                     {
@@ -144,19 +146,17 @@ namespace MakeUnique
                     {
 
                     }
-                    StepProgess();
-                }
-            });
-            del.ForEach((item) => listView_DupFiles.Items.Remove(item));
+                });
+                StepProgess();
+                listView_DupFiles.Items.Remove(item);
+            }
+
             EndRemove();
         }
 
         private void StepProgess()
         {
-            statusStrip.Invoke(new Action(() =>
-            {
-                toolStripProgressBar.PerformStep();
-            }));
+            toolStripProgressBar.PerformStep();
         }
 
         private void SetMaxProgress(int val)
@@ -180,29 +180,45 @@ namespace MakeUnique
             var option = toolStripButton_IncludeSub.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var pattern = toolStripTextBox_Filter.Text.Trim();
             pattern = string.IsNullOrEmpty(pattern) ? "*" : pattern;
-            bool isCancel = false;
+
+            await DoFindFiles(reader, option, pattern);
+
+        }
+
+        private async Task DoFindFiles(IFileInfoReader reader, SearchOption option, string pattern)
+        {
+            ConcurrentBag<ListViewGroup> grpBag = new ConcurrentBag<ListViewGroup>();
+            ConcurrentBag<ListViewItem> itemBag = new ConcurrentBag<ListViewItem>();
             await Task.Run(() =>
             {
+                var result = finder_.GetDuplicateFiles(pattern, option, reader, cancel_);
                 try
                 {
-                    var result = finder_.GetDuplicateFiles(pattern, option, reader, cancel_);
-                    AppendResult(result, reader);
+                    result.ForAll((item) =>
+                    {
+                        var grp = new ListViewGroup(reader.ConvertGroupKey(item.Key));
+
+                        foreach (var str in item)
+                        {
+                            var listviewItem = new ListViewItem(str, grp);
+                            grp.Items.Add(listviewItem);
+                            itemBag.Add(listviewItem);
+                        }
+                        grpBag.Add(grp);
+                    });
                 }
                 catch (OperationCanceledException)
                 {
-                    isCancel = true;
+                    MessageBox.Show(this, "查找过程由用户取消");
                 }
                 catch (Exception exc)
                 {
-                    Invoke(new Action(() => MessageBox.Show(this, exc.InnerException.Message, exc.Message)));
+                    MessageBox.Show(this, exc.InnerException.Message, exc.Message);
                 }
             });
-            if (isCancel)
-            {
-                MessageBox.Show(this, "查找过程由用户取消");
-            }
-            EndFind();
+            AddGroup(grpBag, itemBag);
         }
+
         private void BeginFind()
         {
             cancel_ = new CancellationTokenSource();
@@ -225,41 +241,27 @@ namespace MakeUnique
             toolStripProgressBar.Style = ProgressBarStyle.Blocks;
         }
 
-        private void AppendResult(ParallelQuery<IGrouping<string, string>> result, IFileInfoReader reader)
-        {
-            ConcurrentBag<ListViewGroup> grpBag = new ConcurrentBag<ListViewGroup>();
-            ConcurrentBag<ListViewItem> itemBag = new ConcurrentBag<ListViewItem>();
-            int x = result.Count();
-            result.ForAll((item) =>
-            {
-                var grp = new ListViewGroup(reader.ConvertGroupKey(item.Key));
 
-                foreach (var str in item)
-                {
-                    var listviewItem = new ListViewItem(str, grp);
-                    grp.Items.Add(listviewItem);
-                    itemBag.Add(listviewItem);
-                }
-                grpBag.Add(grp);
-            });
-            AddGroup(grpBag.ToArray(), itemBag.ToArray());
-        }
-
-        private void AddGroup(ListViewGroup[] grpBag, ListViewItem[] itemBag)
+        private void AddGroup(ConcurrentBag<ListViewGroup> grpBag, ConcurrentBag<ListViewItem> itemBag)
         {
             // FIX: 虚拟模式不能用组吗？这样几千个文件的时候会卡
             // 这里消耗时间甚至比搜索时间要多,如果不能用组，只能换一种表示方式了
-            listView_DupFiles.Invoke(new Action(() =>
+            listView_DupFiles.BeginInvoke(new Action(() =>
             {
-                listView_DupFiles.Groups.AddRange(grpBag);
+                listView_DupFiles.BeginUpdate();
+                listView_DupFiles.Groups.AddRange(grpBag.ToArray());
                 //listView_DupFiles.VirtualMode = true;
                 //listView_DupFiles.RetrieveVirtualItem += (sender, e) =>
                 //{
                 //    e.Item = itemBag[e.ItemIndex];
                 //};
                 //listView_DupFiles.VirtualListSize = itemBag.Length;
-                listView_DupFiles.Items.AddRange(itemBag);
+                listView_DupFiles.Items.AddRange(itemBag.ToArray());
+                listView_DupFiles.EndUpdate();
+
+                EndFind();
             }));
+            
         }
         private void EndRemove()
         {
@@ -278,26 +280,7 @@ namespace MakeUnique
             toolStripProgressBar.Value = 0;
         }
 
-        private bool CheckSelect()
-        {
-            foreach (ListViewGroup grp in listView_DupFiles.Groups)
-            {
-                bool allChecked = true;
-                foreach (ListViewItem item in grp.Items)
-                {
-                    if (!item.Checked)
-                    {
-                        allChecked = false;
-                        break;
-                    }
-                }
-                if (allChecked)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+
 
         private void ForAllDuplicateGroups(Action<ListViewGroup> grpCallback, Action<ListViewItem> itemCallback)
         {

@@ -1,5 +1,6 @@
 ﻿using MakeUnique.Lib.Detail;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -32,11 +33,20 @@ namespace MakeUnique.Lib
         {
             return (from path in dirs_ where Directory.Exists(path) select path).Distinct();
         }
-        protected HashSet<string> GetAllFiles(string pattern, SearchOption option)
+        // 得到的路径绝对不会重复
+        protected ParallelQuery<string> GetAllFiles(string pattern, SearchOption option)
         {
-            return new HashSet<string>(from dir in GetExistDir()
-                                       from file in Directory.EnumerateFiles(dir, pattern, option)
-                                       select file);
+            IEnumerable<string> dirs = GetExistDir();
+            if (option == SearchOption.AllDirectories)
+            {
+                var subDirs = from dir in GetExistDir()
+                              from subDir in Directory.EnumerateDirectories(dir, pattern, option)
+                              select subDir;
+                dirs = subDirs.Concat(dirs).Distinct();
+            }
+            return (from dir in dirs.AsParallel()
+                    from file in Directory.EnumerateFiles(dir, pattern, SearchOption.TopDirectoryOnly)
+                    select file).AsParallel().AsUnordered();
         }
         public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(string pattern, SearchOption option, IFileInfoReader fileInfoReader)
         {
@@ -44,7 +54,7 @@ namespace MakeUnique.Lib
         }
         public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(string pattern, SearchOption option, IFileInfoReader fileInfoReader, CancellationTokenSource cancel)
         {
-            return fileInfoReader.GetDuplicateFiles(GetAllFiles(pattern, option)).WithCancellation(cancel.Token);
+            return GetDuplicateFiles(pattern, option, fileInfoReader).WithCancellation(cancel.Token);
         }
         public int Count()
         {
