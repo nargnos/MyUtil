@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MakeUnique.Lib.Reader
+namespace MakeUnique.Lib.Detail
 {
     class GroupingKeyConverter<TSourceKey, TKey, TElememt> : IGrouping<TKey, TElememt>
     {

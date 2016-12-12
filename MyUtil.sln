@@ -17,8 +17,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MorseTest", "MorseTest\Mors
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MakeUnique", "MakeUnique\MakeUnique.csproj", "{4887E3EF-6F00-4FCF-A6B0-B1C2CD3DC78C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MakeUniqueTest", "MakeUniqueTest\MakeUniqueTest.csproj", "{5E08D9EE-9DE5-47A9-BB3F-CCD3DE869C09}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,10 +51,6 @@ Global
 		{4887E3EF-6F00-4FCF-A6B0-B1C2CD3DC78C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4887E3EF-6F00-4FCF-A6B0-B1C2CD3DC78C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4887E3EF-6F00-4FCF-A6B0-B1C2CD3DC78C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5E08D9EE-9DE5-47A9-BB3F-CCD3DE869C09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5E08D9EE-9DE5-47A9-BB3F-CCD3DE869C09}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5E08D9EE-9DE5-47A9-BB3F-CCD3DE869C09}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5E08D9EE-9DE5-47A9-BB3F-CCD3DE869C09}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

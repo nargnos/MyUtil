@@ -1,5 +1,4 @@
 ﻿using MakeUnique.Lib.Detail;
-using MakeUnique.Lib.Reader;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -9,20 +8,20 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MakeUnique.Lib
+namespace MakeUnique.Lib.Finder
 {
 
-
-
-    public class FileSizeReader : IFileInfoReader
+    class SizeDuplicate : IGetDuplicate
     {
+        public string Name => "文件大小";
+
         public string ConvertGroupKey(string key)
         {
             var size = Convert.ToInt64(key);
             StringBuilder sb = new StringBuilder(32);
             FileUtils.StrFormatByteSizeW(size, sb, sb.Capacity);
 
-            return $"文件大小: {sb.ToString()}";
+            return $"{Name}: {sb.ToString()}";
         }
 
         public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(ParallelQuery<string> files)

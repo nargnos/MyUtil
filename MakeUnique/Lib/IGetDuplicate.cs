@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MakeUnique.Lib.Detail
+namespace MakeUnique.Lib
 {
-    public interface IFileInfoReader
+    public interface IGetDuplicate
     {
         ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(ParallelQuery<string> files);
         string ConvertGroupKey(string key);
+        string Name { get; }
     }
 }

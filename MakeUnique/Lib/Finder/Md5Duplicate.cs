@@ -1,5 +1,4 @@
-﻿using MakeUnique.Lib.Detail;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,12 +6,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
-using MakeUnique.Lib.Reader;
+using MakeUnique.Lib.Detail;
 
-namespace MakeUnique.Lib
+namespace MakeUnique.Lib.Finder
 {
-    public class FileMd5Reader : FileSizeReader, IFileInfoReader
+    class Md5Duplicate : SizeDuplicate, IGetDuplicate
     {
+        public new string Name => "MD5";
         protected class MD5KeyComparer : EqualityComparer<byte[]>
         {
             public override bool Equals(byte[] x, byte[] y)
@@ -35,7 +35,7 @@ namespace MakeUnique.Lib
         }
         public new string ConvertGroupKey(string key)
         {
-            return $"MD5: {key}";
+            return $"{Name}: {key}";
         }
         public new ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(ParallelQuery<string> files)
         {

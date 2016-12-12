@@ -1,5 +1,6 @@
 ﻿using MakeUnique.Lib;
 using MakeUnique.Lib.Detail;
+using MakeUnique.Lib.Finder;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -22,13 +23,78 @@ namespace MakeUnique
         public GUI()
         {
             InitializeComponent();
+            InitFinderButton();
 
             ClearResultView();
         }
+        private void InitFinderButton()
+        {
+            toolStrip_Dir.SuspendLayout();
+            toolStripDropDownButton_Find.DropDownItems.Clear();
+            foreach (var item in FinderFactory.GetDuplicateFinders())
+            {
+                var tmp = toolStripDropDownButton_Find.DropDownItems.Add(item.Name);
+                tmp.Click += async (sender, e) =>
+                {
+                    await FindFiles(item);
+                };
+            }
+
+            toolStrip_Dir.ResumeLayout();
+
+        }
+
+        private void LockDirList()
+        {
+            splitContainer1.Panel1.Enabled = false;
+        }
+        private void LockResultList()
+        {
+            splitContainer1.Panel2.Enabled = false;
+        }
+        private void UnLockDirList()
+        {
+            splitContainer1.Panel1.Enabled = true;
+        }
+        private void UnLockResultList()
+        {
+            splitContainer1.Panel2.Enabled = true;
+        }
+        private void LockFindButton()
+        {
+            toolStripDropDownButton_Find.Enabled = false;
+        }
+        private void UnLockFindButton()
+        {
+            toolStripDropDownButton_Find.Enabled = true;
+        }
+        private void ShowProgess()
+        {
+            toolStripProgressBar.Visible = true;
+        }
+        private void HideProgess()
+        {
+            toolStripProgressBar.Visible = false;
+        }
+        private void StepProgess()
+        {
+            toolStripProgressBar.PerformStep();
+        }
+
+        private void SetMaxProgress(int val)
+        {
+            toolStripProgressBar.Maximum = val;
+        }
+
+        private void ClearProgress()
+        {
+            toolStripProgressBar.Value = 0;
+        }
+
 
         private DuplicateFileFinder finder_ = new DuplicateFileFinder();
         private CancellationTokenSource cancel_;
-        private void toolStripButton_Add_Click(object sender, EventArgs e)
+        private void OnAddDirButtonClick(object sender, EventArgs e)
         {
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
@@ -49,13 +115,13 @@ namespace MakeUnique
             listView_DirList.VirtualListSize = finder_.Count();
         }
 
-        private void listView_DirList_RetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
+
+        private void OnDirListRetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
         {
-            e.Item = new ListViewItem(finder_.ElementAt(e.ItemIndex));
+            e.Item = new ListViewItem(finder_.GetDir(e.ItemIndex));
         }
 
-
-        private void toolStripButton_Del_Click(object sender, EventArgs e)
+        private void OnDelDirButtonClick(object sender, EventArgs e)
         {
             if (listView_DirList.SelectedIndices.Count == 0)
             {
@@ -71,7 +137,7 @@ namespace MakeUnique
                 List<string> select = new List<string>();
                 foreach (int item in listView_DirList.SelectedIndices)
                 {
-                    select.Add(finder_.ElementAt(item));
+                    select.Add(finder_.GetDir(item));
                 }
                 select.ForEach((str) => finder_.Remove(str));
             }
@@ -80,26 +146,21 @@ namespace MakeUnique
         }
 
 
-        private async void ToolStripMenuItem_FindSameName_Click(object sender, EventArgs e)
+
+        private void ClearResultView()
         {
-            await FindFiles(new FileNameReader());
+            Text = string.Empty;
+            listView_DupFiles.Items.Clear();
+            listView_DupFiles.Groups.Clear();
         }
 
-        private async void ToolStripMenuItem_FindSameSize_Click(object sender, EventArgs e)
-        {
-            await FindFiles(new FileSizeReader());
-        }
-
-        private async void ToolStripMenuItem_FindSameMd5_Click(object sender, EventArgs e)
-        {
-            await FindFiles(new FileMd5Reader());
-        }
-        private void toolStripButton_Clear_Click(object sender, EventArgs e)
+        private void OnClearResultButtonClick(object sender, EventArgs e)
         {
             ClearResultView();
         }
 
-        private void listView_DupFiles_DoubleClick(object sender, EventArgs e)
+
+        private void OnResultItemDoubleClick(object sender, EventArgs e)
         {
             if (listView_DupFiles.SelectedItems?.Count == 1)
             {
@@ -107,7 +168,7 @@ namespace MakeUnique
             }
         }
 
-        private void toolStripButton_Select_Click(object sender, EventArgs e)
+        private void OnSelectResultButtonClick(object sender, EventArgs e)
         {
             ForAllDuplicateGroups((val) => { val.Items[0].Checked = false; }, (val) => { val.Checked = true; });
         }
@@ -118,7 +179,22 @@ namespace MakeUnique
             return !listView_DupFiles.Groups.Cast<ListViewGroup>().Any((grp) =>
                 grp.Items.Cast<ListViewItem>().All((item) => item.Checked));
         }
-        private async void toolStripButton_RemoveFile_Click(object sender, EventArgs e)
+        private void EndRemove()
+        {
+            HideProgess();
+            UnLockResultList();
+            UnLockDirList();
+        }
+
+        private void BeginRemove()
+        {
+            LockResultList();
+            LockDirList();
+            ClearProgress();
+            ShowProgess();
+        }
+
+        private async void OnRemoveFileButtonClick(object sender, EventArgs e)
         {
             // 检查选择项
             if (!CheckSelect())
@@ -128,73 +204,76 @@ namespace MakeUnique
                     return;
                 }
             }
-            BeginRemove();
 
-            var del = listView_DupFiles.CheckedItems.Cast<ListViewItem>();
-
-            SetMaxProgress(del.Count());
-
-            foreach (var item in del)
+            try
             {
-                await Task.Run(() =>
+                BeginRemove();
+                var del = listView_DupFiles.CheckedItems.Cast<ListViewItem>();
+
+                SetMaxProgress(del.Count());
+
+                foreach (var item in del)
                 {
-                    try
-                    {
-                        FileUtils.DeleteFile(item.Text, false, true);
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-                });
-                StepProgess();
-                listView_DupFiles.Items.Remove(item);
+                    await DelFile(item.Text);
+                    StepProgess();
+                    listView_DupFiles.Items.Remove(item);
+                }
             }
-
-            EndRemove();
+            finally
+            {
+                EndRemove();
+            }
         }
 
-        private void StepProgess()
+        private static async Task DelFile(string path)
         {
-            toolStripProgressBar.PerformStep();
+            await Task.Run(() =>
+            {
+                try
+                {
+                    FileUtils.DeleteFile(path, false, true);
+                }
+                catch
+                {
+
+                }
+            });
         }
 
-        private void SetMaxProgress(int val)
-        {
-            toolStripProgressBar.Maximum = val;
-        }
-
-        private void ClearResultView()
-        {
-            Text = string.Empty;
-            listView_DupFiles.Items.Clear();
-            listView_DupFiles.Groups.Clear();
-        }
-        private async Task FindFiles(IFileInfoReader reader)
+        private async Task FindFiles(IGetDuplicate reader)
         {
             if (finder_.Count() == 0)
             {
                 return;
             }
-            BeginFind();
-            var option = toolStripButton_IncludeSub.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-            var pattern = toolStripTextBox_Filter.Text.Trim();
-            pattern = string.IsNullOrEmpty(pattern) ? "*" : pattern;
+            try
+            {
+                BeginFind();
+                var option = toolStripButton_IncludeSub.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+                var pattern = toolStripTextBox_Filter.Text.Trim();
+                pattern = string.IsNullOrEmpty(pattern) ? "*" : pattern;
 
-            await DoFindFiles(reader, option, pattern);
-
+                var found = await DoFindFiles(reader, option, pattern);
+                await AddGroup(found.Item1, found.Item2);
+            }
+            finally
+            {
+                EndFind();
+            }
         }
 
-        private async Task DoFindFiles(IFileInfoReader reader, SearchOption option, string pattern)
+        private async Task<Tuple<ListViewGroup[], ListViewItem[]>> DoFindFiles(IGetDuplicate reader, SearchOption option, string pattern)
         {
-            ConcurrentBag<ListViewGroup> grpBag = new ConcurrentBag<ListViewGroup>();
-            ConcurrentBag<ListViewItem> itemBag = new ConcurrentBag<ListViewItem>();
+            Tuple<ListViewGroup[], ListViewItem[]> result = null;
+
             await Task.Run(() =>
             {
-                var result = finder_.GetDuplicateFiles(pattern, option, reader, cancel_);
+                ConcurrentBag<ListViewGroup> grpBag = new ConcurrentBag<ListViewGroup>();
+                ConcurrentBag<ListViewItem> itemBag = new ConcurrentBag<ListViewItem>();
+                var files = finder_.GetDuplicateFiles(pattern, option, reader, cancel_);
                 try
                 {
-                    result.ForAll((item) =>
+                    files.ForAll((item) =>
                     {
                         var grp = new ListViewGroup(reader.ConvertGroupKey(item.Key));
 
@@ -209,76 +288,77 @@ namespace MakeUnique
                 }
                 catch (OperationCanceledException)
                 {
-                    MessageBox.Show(this, "查找过程由用户取消");
+                    Invoke(new Action(() =>
+                    {
+                        MessageBox.Show(this, "查找过程由用户取消");
+                    }));
                 }
                 catch (Exception exc)
                 {
-                    MessageBox.Show(this, exc.InnerException.Message, exc.Message);
+                    Invoke(new Action(() =>
+                    {
+                        MessageBox.Show(this, exc.InnerException.Message, exc.Message);
+                    }));
+                }
+                finally
+                {
+                    result = new Tuple<ListViewGroup[], ListViewItem[]>(grpBag.ToArray(), itemBag.ToArray());
                 }
             });
-            AddGroup(grpBag, itemBag);
+            return result;
         }
 
-        private void BeginFind()
-        {
-            cancel_ = new CancellationTokenSource();
-            toolStripDropDownButton.Visible = false;
-            toolStripButton_Cancel.Visible = true;
-            toolStrip_Dir.Enabled = false;
-            BeginRemove();
-            ClearResultView();
-            Text = "正在查找...";
-            toolStripProgressBar.Style = ProgressBarStyle.Marquee;
-        }
-        private void EndFind()
-        {
-            cancel_ = null;
-            toolStripDropDownButton.Visible = true;
-            toolStripButton_Cancel.Visible = false;
-            toolStrip_Dir.Enabled = true;
-            EndRemove();
-            Text = $"找到 {listView_DupFiles.Groups.Count}个重复，共 {listView_DupFiles.Items.Count} 个文件";
-            toolStripProgressBar.Style = ProgressBarStyle.Blocks;
-        }
-
-
-        private void AddGroup(ConcurrentBag<ListViewGroup> grpBag, ConcurrentBag<ListViewItem> itemBag)
+        private async Task AddGroup(ListViewGroup[] grps, ListViewItem[] items)
         {
             // FIX: 虚拟模式不能用组吗？这样几千个文件的时候会卡
             // 这里消耗时间甚至比搜索时间要多,如果不能用组，只能换一种表示方式了
-            listView_DupFiles.BeginInvoke(new Action(() =>
+            var asyncResult = listView_DupFiles.BeginInvoke(new Action(() =>
             {
                 listView_DupFiles.BeginUpdate();
-                listView_DupFiles.Groups.AddRange(grpBag.ToArray());
+                listView_DupFiles.Groups.AddRange(grps);
                 //listView_DupFiles.VirtualMode = true;
                 //listView_DupFiles.RetrieveVirtualItem += (sender, e) =>
                 //{
                 //    e.Item = itemBag[e.ItemIndex];
                 //};
                 //listView_DupFiles.VirtualListSize = itemBag.Length;
-                listView_DupFiles.Items.AddRange(itemBag.ToArray());
+                listView_DupFiles.Items.AddRange(items);
                 listView_DupFiles.EndUpdate();
-
-                EndFind();
             }));
-            
-        }
-        private void EndRemove()
-        {
-            toolStripProgressBar.Visible = false;
-            toolStrip_Dir.Enabled = true;
-            toolStrip_File.Enabled = true;
-            listView_DupFiles.Enabled = true;
+            await Task.Run(() => { asyncResult.AsyncWaitHandle.WaitOne(); });
         }
 
-        private void BeginRemove()
+        private void BeginFind()
         {
-            toolStrip_Dir.Enabled = false;
-            toolStrip_File.Enabled = false;
-            listView_DupFiles.Enabled = false;
-            toolStripProgressBar.Visible = true;
-            toolStripProgressBar.Value = 0;
+            cancel_ = new CancellationTokenSource();
+            toolStripDropDownButton_Find.Visible = false;
+            toolStripButton_Cancel.Text = "按Esc取消";
+            toolStripButton_Cancel.Visible = true;
+
+            LockResultList();
+            LockDirList();
+            ClearProgress();
+            ShowProgess();
+            ClearResultView();
+
+            Text = "正在查找...";
+            toolStripProgressBar.Style = ProgressBarStyle.Marquee;
         }
+        private void EndFind()
+        {
+            cancel_ = null;
+            toolStripDropDownButton_Find.Visible = true;
+            toolStripButton_Cancel.Visible = false;
+
+            HideProgess();
+            UnLockResultList();
+            UnLockDirList();
+
+            Text = $"找到 {listView_DupFiles.Groups.Count}个重复，共 {listView_DupFiles.Items.Count} 个文件";
+            toolStripProgressBar.Style = ProgressBarStyle.Blocks;
+        }
+
+
 
 
 
@@ -294,12 +374,12 @@ namespace MakeUnique
             }
         }
 
-        private void toolStripButton_AllCheck_Click(object sender, EventArgs e)
+        private void OnAllCheckButtonClick(object sender, EventArgs e)
         {
             ChangeDupChecked(true);
         }
 
-        private void toolStripButton_ClearCheck_Click(object sender, EventArgs e)
+        private void OnClearCheckButtonClick(object sender, EventArgs e)
         {
             ChangeDupChecked(false);
         }
@@ -317,7 +397,7 @@ namespace MakeUnique
             }
         }
 
-        private void toolStripButton_Search_Click(object sender, EventArgs e)
+        private void OnSearchButtonClick(object sender, EventArgs e)
         {
             listView_DupFiles.SelectedItems.Clear();
             var search = toolStripTextBox_Search.Text;
@@ -335,15 +415,23 @@ namespace MakeUnique
             listView_DupFiles.Select();
         }
 
-        private void GUI_KeyDown(object sender, KeyEventArgs e)
+        private void OnGUIKeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
             {
-                cancel_?.Cancel();
+                if (cancel_.IsCancellationRequested)
+                {
+                    return;
+                }
+                cancel_.Cancel();
+                if (cancel_.IsCancellationRequested)
+                {
+                    toolStripButton_Cancel.Text = "正在取消";
+                }
             }
         }
 
-        private void listView_DirList_DragDrop(object sender, DragEventArgs e)
+        private void OnDirListDragDrop(object sender, DragEventArgs e)
         {
             var data = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -353,14 +441,12 @@ namespace MakeUnique
             }
         }
 
-        private void listView_DirList_DragEnter(object sender, DragEventArgs e)
+        private void OnDirListDragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 e.Effect = DragDropEffects.Link;
             }
         }
-
-
     }
 }

@@ -1,5 +1,4 @@
-﻿using MakeUnique.Lib.Detail;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -12,11 +11,21 @@ namespace MakeUnique.Lib
 {
     public class DuplicateFileFinder
     {
+
         public DuplicateFileFinder()
         {
             dirs_ = new HashSet<string>();
         }
+        public int Count()
+        {
+            return dirs_.Count;
+        }
+        public string this[int index] => GetDir(index);
 
+        public string GetDir(int index)
+        {
+            return dirs_.ElementAt(index);
+        }
         public bool Add(string path)
         {
             return dirs_.Add(path);
@@ -29,17 +38,18 @@ namespace MakeUnique.Lib
         {
             dirs_.Clear();
         }
-        protected IEnumerable<string> GetExistDir()
+
+        private IEnumerable<string> GetDir()
         {
-            return (from path in dirs_ where Directory.Exists(path) select path).Distinct();
+            return from path in dirs_ where Directory.Exists(path) select path;
         }
         // 得到的路径绝对不会重复
-        protected ParallelQuery<string> GetAllFiles(string pattern, SearchOption option)
+        private ParallelQuery<string> GetAllFiles(string pattern, SearchOption option)
         {
-            IEnumerable<string> dirs = GetExistDir();
+            IEnumerable<string> dirs = GetDir();
             if (option == SearchOption.AllDirectories)
             {
-                var subDirs = from dir in GetExistDir()
+                var subDirs = from dir in dirs
                               from subDir in Directory.EnumerateDirectories(dir, pattern, option)
                               select subDir;
                 dirs = subDirs.Concat(dirs).Distinct();
@@ -48,23 +58,16 @@ namespace MakeUnique.Lib
                     from file in Directory.EnumerateFiles(dir, pattern, SearchOption.TopDirectoryOnly)
                     select file).AsParallel().AsUnordered();
         }
-        public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(string pattern, SearchOption option, IFileInfoReader fileInfoReader)
+
+        public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(string pattern, SearchOption option, IGetDuplicate finder)
         {
-            return fileInfoReader.GetDuplicateFiles(GetAllFiles(pattern, option));
+            return finder.GetDuplicateFiles(GetAllFiles(pattern, option));
         }
-        public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(string pattern, SearchOption option, IFileInfoReader fileInfoReader, CancellationTokenSource cancel)
+        public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(string pattern, SearchOption option, IGetDuplicate finder, CancellationTokenSource cancel)
         {
-            return GetDuplicateFiles(pattern, option, fileInfoReader).WithCancellation(cancel.Token);
-        }
-        public int Count()
-        {
-            return dirs_.Count;
-        }
-        public string ElementAt(int index)
-        {
-            return dirs_.ElementAt(index);
+            return GetDuplicateFiles(pattern, option, finder).WithCancellation(cancel.Token);
         }
 
-        protected HashSet<string> dirs_;
+        private HashSet<string> dirs_;
     }
 }

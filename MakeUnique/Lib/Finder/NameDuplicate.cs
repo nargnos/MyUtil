@@ -1,18 +1,19 @@
-﻿using MakeUnique.Lib.Detail;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MakeUnique.Lib
+namespace MakeUnique.Lib.Finder
 {
-    public class FileNameReader : IFileInfoReader
+    class NameDuplicate : IGetDuplicate
     {
+        public string Name => "文件名";
+
         public string ConvertGroupKey(string key)
         {
-            return $"文件名: {key}";
+            return $"{Name}: {key}";
         }
 
         public ParallelQuery<IGrouping<string, string>> GetDuplicateFiles(ParallelQuery<string> files)

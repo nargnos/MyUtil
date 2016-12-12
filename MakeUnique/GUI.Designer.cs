@@ -41,10 +41,7 @@
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripTextBox_Filter = new System.Windows.Forms.ToolStripTextBox();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripDropDownButton = new System.Windows.Forms.ToolStripDropDownButton();
-            this.ToolStripMenuItem_FindSameName = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuItem_FindSameSize = new System.Windows.Forms.ToolStripMenuItem();
-            this.ToolStripMenuItem_FindSameMd5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDropDownButton_Find = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolStripButton_Cancel = new System.Windows.Forms.ToolStripButton();
             this.listView_DirList = new System.Windows.Forms.ListView();
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -92,7 +89,7 @@
             this.listView_DupFiles.TabIndex = 3;
             this.listView_DupFiles.UseCompatibleStateImageBehavior = false;
             this.listView_DupFiles.View = System.Windows.Forms.View.Details;
-            this.listView_DupFiles.DoubleClick += new System.EventHandler(this.listView_DupFiles_DoubleClick);
+            this.listView_DupFiles.DoubleClick += new System.EventHandler(this.OnResultItemDoubleClick);
             // 
             // columnHeader1
             // 
@@ -148,7 +145,7 @@
             this.toolStripLabel2,
             this.toolStripTextBox_Filter,
             this.toolStripSeparator1,
-            this.toolStripDropDownButton,
+            this.toolStripDropDownButton_Find,
             this.toolStripButton_Cancel});
             this.toolStrip_Dir.Location = new System.Drawing.Point(0, 0);
             this.toolStrip_Dir.Name = "toolStrip_Dir";
@@ -165,7 +162,7 @@
             this.toolStripButton_Add.Name = "toolStripButton_Add";
             this.toolStripButton_Add.Size = new System.Drawing.Size(43, 24);
             this.toolStripButton_Add.Text = "添加";
-            this.toolStripButton_Add.Click += new System.EventHandler(this.toolStripButton_Add_Click);
+            this.toolStripButton_Add.Click += new System.EventHandler(this.OnAddDirButtonClick);
             // 
             // toolStripButton_Del
             // 
@@ -175,7 +172,7 @@
             this.toolStripButton_Del.Name = "toolStripButton_Del";
             this.toolStripButton_Del.Size = new System.Drawing.Size(43, 24);
             this.toolStripButton_Del.Text = "删除";
-            this.toolStripButton_Del.Click += new System.EventHandler(this.toolStripButton_Del_Click);
+            this.toolStripButton_Del.Click += new System.EventHandler(this.OnDelDirButtonClick);
             // 
             // toolStripSeparator3
             // 
@@ -211,40 +208,14 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
             // 
-            // toolStripDropDownButton
+            // toolStripDropDownButton_Find
             // 
-            this.toolStripDropDownButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ToolStripMenuItem_FindSameName,
-            this.ToolStripMenuItem_FindSameSize,
-            this.ToolStripMenuItem_FindSameMd5});
-            this.toolStripDropDownButton.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton.Image")));
-            this.toolStripDropDownButton.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton.Name = "toolStripDropDownButton";
-            this.toolStripDropDownButton.Size = new System.Drawing.Size(83, 24);
-            this.toolStripDropDownButton.Text = "查找重复";
-            // 
-            // ToolStripMenuItem_FindSameName
-            // 
-            this.ToolStripMenuItem_FindSameName.Name = "ToolStripMenuItem_FindSameName";
-            this.ToolStripMenuItem_FindSameName.Size = new System.Drawing.Size(163, 26);
-            this.ToolStripMenuItem_FindSameName.Text = "同名文件";
-            this.ToolStripMenuItem_FindSameName.Click += new System.EventHandler(this.ToolStripMenuItem_FindSameName_Click);
-            // 
-            // ToolStripMenuItem_FindSameSize
-            // 
-            this.ToolStripMenuItem_FindSameSize.Name = "ToolStripMenuItem_FindSameSize";
-            this.ToolStripMenuItem_FindSameSize.Size = new System.Drawing.Size(163, 26);
-            this.ToolStripMenuItem_FindSameSize.Text = "同大小文件";
-            this.ToolStripMenuItem_FindSameSize.Click += new System.EventHandler(this.ToolStripMenuItem_FindSameSize_Click);
-            // 
-            // ToolStripMenuItem_FindSameMd5
-            // 
-            this.ToolStripMenuItem_FindSameMd5.Name = "ToolStripMenuItem_FindSameMd5";
-            this.ToolStripMenuItem_FindSameMd5.Size = new System.Drawing.Size(163, 26);
-            this.ToolStripMenuItem_FindSameMd5.Text = "同Md5文件";
-            this.ToolStripMenuItem_FindSameMd5.ToolTipText = "花费时间可能较长";
-            this.ToolStripMenuItem_FindSameMd5.Click += new System.EventHandler(this.ToolStripMenuItem_FindSameMd5_Click);
+            this.toolStripDropDownButton_Find.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton_Find.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton_Find.Image")));
+            this.toolStripDropDownButton_Find.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton_Find.Name = "toolStripDropDownButton_Find";
+            this.toolStripDropDownButton_Find.Size = new System.Drawing.Size(83, 24);
+            this.toolStripDropDownButton_Find.Text = "查找重复";
             // 
             // toolStripButton_Cancel
             // 
@@ -274,9 +245,9 @@
             this.listView_DirList.UseCompatibleStateImageBehavior = false;
             this.listView_DirList.View = System.Windows.Forms.View.Details;
             this.listView_DirList.VirtualMode = true;
-            this.listView_DirList.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.listView_DirList_RetrieveVirtualItem);
-            this.listView_DirList.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView_DirList_DragDrop);
-            this.listView_DirList.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView_DirList_DragEnter);
+            this.listView_DirList.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.OnDirListRetrieveVirtualItem);
+            this.listView_DirList.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDirListDragDrop);
+            this.listView_DirList.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDirListDragEnter);
             // 
             // columnHeader2
             // 
@@ -331,7 +302,7 @@
             this.toolStripButton_RemoveFile.Name = "toolStripButton_RemoveFile";
             this.toolStripButton_RemoveFile.Size = new System.Drawing.Size(43, 24);
             this.toolStripButton_RemoveFile.Text = "清理";
-            this.toolStripButton_RemoveFile.Click += new System.EventHandler(this.toolStripButton_RemoveFile_Click);
+            this.toolStripButton_RemoveFile.Click += new System.EventHandler(this.OnRemoveFileButtonClick);
             // 
             // toolStripSeparator2
             // 
@@ -348,7 +319,7 @@
             this.toolStripButton_Clear.Name = "toolStripButton_Clear";
             this.toolStripButton_Clear.Size = new System.Drawing.Size(73, 24);
             this.toolStripButton_Clear.Text = "清空列表";
-            this.toolStripButton_Clear.Click += new System.EventHandler(this.toolStripButton_Clear_Click);
+            this.toolStripButton_Clear.Click += new System.EventHandler(this.OnClearResultButtonClick);
             // 
             // toolStripSeparator5
             // 
@@ -365,7 +336,7 @@
             this.toolStripButton_Select.Name = "toolStripButton_Select";
             this.toolStripButton_Select.Size = new System.Drawing.Size(133, 24);
             this.toolStripButton_Select.Text = "自动标记重复文件";
-            this.toolStripButton_Select.Click += new System.EventHandler(this.toolStripButton_Select_Click);
+            this.toolStripButton_Select.Click += new System.EventHandler(this.OnSelectResultButtonClick);
             // 
             // toolStripSeparator4
             // 
@@ -382,7 +353,7 @@
             this.toolStripButton_ClearCheck.Name = "toolStripButton_ClearCheck";
             this.toolStripButton_ClearCheck.Size = new System.Drawing.Size(103, 24);
             this.toolStripButton_ClearCheck.Text = "清除所有标记";
-            this.toolStripButton_ClearCheck.Click += new System.EventHandler(this.toolStripButton_ClearCheck_Click);
+            this.toolStripButton_ClearCheck.Click += new System.EventHandler(this.OnClearCheckButtonClick);
             // 
             // toolStripButton_AllCheck
             // 
@@ -393,7 +364,7 @@
             this.toolStripButton_AllCheck.Name = "toolStripButton_AllCheck";
             this.toolStripButton_AllCheck.Size = new System.Drawing.Size(58, 24);
             this.toolStripButton_AllCheck.Text = "全标记";
-            this.toolStripButton_AllCheck.Click += new System.EventHandler(this.toolStripButton_AllCheck_Click);
+            this.toolStripButton_AllCheck.Click += new System.EventHandler(this.OnAllCheckButtonClick);
             // 
             // toolStripSeparator6
             // 
@@ -410,7 +381,7 @@
             this.toolStripButton_Search.Name = "toolStripButton_Search";
             this.toolStripButton_Search.Size = new System.Drawing.Size(43, 24);
             this.toolStripButton_Search.Text = "搜索";
-            this.toolStripButton_Search.Click += new System.EventHandler(this.toolStripButton_Search_Click);
+            this.toolStripButton_Search.Click += new System.EventHandler(this.OnSearchButtonClick);
             // 
             // toolStripTextBox_Search
             // 
@@ -455,7 +426,7 @@
             this.Name = "GUI";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "简单测试";
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.GUI_KeyDown);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnGUIKeyDown);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
@@ -497,10 +468,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButton_IncludeSub;
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;
         private System.Windows.Forms.ToolStripTextBox toolStripTextBox_Filter;
-        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_FindSameName;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_FindSameSize;
-        private System.Windows.Forms.ToolStripMenuItem ToolStripMenuItem_FindSameMd5;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton_Find;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton toolStripButton_Clear;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;

@@ -75,12 +75,13 @@
       <DependentUpon>GUI.cs</DependentUpon>
     </Compile>
     <Compile Include="Lib\DuplicateFileFinder.cs" />
-    <Compile Include="Lib\FileUtils.cs" />
-    <Compile Include="Lib\Reader\FileMd5Reader.cs" />
-    <Compile Include="Lib\Reader\FileNameReader.cs" />
-    <Compile Include="Lib\Reader\FileSizeReader.cs" />
-    <Compile Include="Lib\Reader\IFileInfoReader.cs" />
-    <Compile Include="Lib\Reader\GroupingKeyConverter.cs" />
+    <Compile Include="Lib\Detail\FileUtils.cs" />
+    <Compile Include="Lib\Finder\Md5Duplicate.cs" />
+    <Compile Include="Lib\Finder\NameDuplicate.cs" />
+    <Compile Include="Lib\Finder\SizeDuplicate.cs" />
+    <Compile Include="Lib\IGetDuplicate.cs" />
+    <Compile Include="Lib\Detail\GroupingKeyConverter.cs" />
+    <Compile Include="Lib\Finder\FinderFactory.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GUI.resx">
