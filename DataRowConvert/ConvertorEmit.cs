@@ -94,19 +94,20 @@ namespace DataRowConvert
             return Expression.Property(result, property.Name);
         }
 
-        private static string GetColName(object[] convertFields)
+        internal static string GetColName(object[] convertFields)
         {
             return (convertFields.First() as ConvertFieldAttribute).ColumnName;
         }
 
-        private static bool CheckConvertFieldAttr(object[] convertFields)
+        internal static bool CheckConvertFieldAttr(object[] convertFields)
         {
             return convertFields.Count() == 1 && convertFields.First() is ConvertFieldAttribute;
         }
 
-        private static object[] GetConvertFieldAttrs(PropertyInfo property)
+        internal static object[] GetConvertFieldAttrs(PropertyInfo property)
         {
             return property.GetCustomAttributes(typeof(ConvertFieldAttribute), true);
         }
+
     }
 }

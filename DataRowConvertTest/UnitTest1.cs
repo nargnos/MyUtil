@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace DataRowConvertTest
 {
-    struct MyStruct
+    public struct MyStruct
     {
         [ConvertorEmit.ConvertField("ID")]
         public int? ID { get; set; }
@@ -19,7 +19,7 @@ namespace DataRowConvertTest
         [ConvertorEmit.ConvertField("Value")]
         public string TextCopy { get; set; }
     }
-    struct MyStruct2
+    public struct MyStruct2
     {
         [ConvertorEmit.ConvertField("ID")]
         public int? A { get; set; }
@@ -66,6 +66,27 @@ namespace DataRowConvertTest
             var output = string.Join(" ", from text in objs select text.Text);
 
             Debug.WriteLine(output);
+        }
+
+        [TestMethod]
+        public void TestGenerateAssembly()
+        {
+            DataTable tb = new DataTable();
+            tb.Columns.Add("ID", typeof(int));
+            tb.Columns.Add("Value", typeof(string));
+            tb.Rows.Add(1, "2");
+            tb.Rows.Add(3, "4");
+
+            var convertor = AssemblyGenerator.GenerateConvertor<MyStruct2>();
+            var s = (MyStruct2)convertor.Convert(tb.Rows[0]);
+            convertor.Fill(tb.Rows[1], s);
+            Assert.IsTrue(tb.Rows[1].Field<int?>("ID")== s.A);
+            Assert.AreEqual(tb.Rows[1].Field<string>("Value"),s.B);
+
+            var convertor2 = AssemblyGenerator.GenerateConvertor<MyStruct>();
+            var s2 = (MyStruct)convertor2.Convert(tb.Rows[0]);
+            Assert.IsTrue(tb.Rows[0].Field<int?>("ID") == s2.ID);
+            Assert.AreEqual(tb.Rows[0].Field<string>("Value"), s2.Text);
         }
     }
 }

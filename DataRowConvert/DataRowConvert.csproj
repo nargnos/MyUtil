@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyGenerator.cs" />
     <Compile Include="ConvertorEmit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

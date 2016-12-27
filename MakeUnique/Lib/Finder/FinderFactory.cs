@@ -10,7 +10,7 @@ namespace MakeUnique.Lib.Finder
 {
     public static class FinderFactory
     {
-        public static List<IGetDuplicate> GetDuplicateFinders()
+        public static IReadOnlyCollection<IGetDuplicate> GetDuplicateFinders()
         {
             return finders_;
         }
