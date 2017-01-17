@@ -10,20 +10,20 @@ namespace DataRowConvertTest
 {
     public struct MyStruct
     {
-        [ConvertorEmit.ConvertField("ID")]
+        [ConvertorExpression.ConvertField("ID")]
         public int? ID { get; set; }
-        [ConvertorEmit.ConvertField("Value")]
+        [ConvertorExpression.ConvertField("Value")]
         public string Text { get; set; }
         public int? Ignore { get; set; }
         // 可以设置多变量接收数据，作为赋值到row的话会保留最后一个重复数据
-        [ConvertorEmit.ConvertField("Value")]
+        [ConvertorExpression.ConvertField("Value")]
         public string TextCopy { get; set; }
     }
     public struct MyStruct2
     {
-        [ConvertorEmit.ConvertField("ID")]
+        [ConvertorExpression.ConvertField("ID")]
         public int? A { get; set; }
-        [ConvertorEmit.ConvertField("Value")]
+        [ConvertorExpression.ConvertField("Value")]
         public string B { get; set; }
         // [ConvertorEmit.ConvertField("Value")]
         public string C { get; set; }
@@ -32,10 +32,10 @@ namespace DataRowConvertTest
     public class DataRowConvertTest
     {
         [TestMethod]
-        public void TestEmitConvertor()
+        public void TestConvertorExpression()
         {
-            var rowToStruct = ConvertorEmit.EmitRowConvert<MyStruct>();
-            var fillRow = ConvertorEmit.EmitFillRow<MyStruct2>();
+            var rowToStruct = ConvertorExpression.EmitRowConvert<MyStruct>();
+            var fillRow = ConvertorExpression.EmitFillRow<MyStruct2>();
 
             DataTable tb = new DataTable();
             tb.Columns.Add("ID", typeof(int));
@@ -68,22 +68,23 @@ namespace DataRowConvertTest
             Debug.WriteLine(output);
         }
 
+
         [TestMethod]
-        public void TestGenerateAssembly()
-        {
+        public void TestConvertorCodeDom()
+        {            
             DataTable tb = new DataTable();
             tb.Columns.Add("ID", typeof(int));
             tb.Columns.Add("Value", typeof(string));
             tb.Rows.Add(1, "2");
             tb.Rows.Add(3, "4");
 
-            var convertor = AssemblyGenerator.GenerateConvertor<MyStruct2>();
+            dynamic convertor = ConvertorCodeDom.GenerateConvertor<MyStruct2>();
             var s = (MyStruct2)convertor.Convert(tb.Rows[0]);
             convertor.Fill(tb.Rows[1], s);
-            Assert.IsTrue(tb.Rows[1].Field<int?>("ID")== s.A);
-            Assert.AreEqual(tb.Rows[1].Field<string>("Value"),s.B);
+            Assert.IsTrue(tb.Rows[1].Field<int?>("ID") == s.A);
+            Assert.AreEqual(tb.Rows[1].Field<string>("Value"), s.B);
 
-            var convertor2 = AssemblyGenerator.GenerateConvertor<MyStruct>();
+            dynamic convertor2 = ConvertorCodeDom.GenerateConvertor<MyStruct>();
             var s2 = (MyStruct)convertor2.Convert(tb.Rows[0]);
             Assert.IsTrue(tb.Rows[0].Field<int?>("ID") == s2.ID);
             Assert.AreEqual(tb.Rows[0].Field<string>("Value"), s2.Text);

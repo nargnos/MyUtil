@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DataRowConvert
 {
-    public static class ConvertorEmit
+    public static class ConvertorExpression
     {
         // 对应目标的映射关系
         [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]

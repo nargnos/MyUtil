@@ -56,6 +56,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -74,14 +75,17 @@
     <Compile Include="GUI.Designer.cs">
       <DependentUpon>GUI.cs</DependentUpon>
     </Compile>
-    <Compile Include="Lib\DuplicateFileFinder.cs" />
-    <Compile Include="Lib\Detail\FileUtils.cs" />
-    <Compile Include="Lib\Finder\Md5Duplicate.cs" />
-    <Compile Include="Lib\Finder\NameDuplicate.cs" />
-    <Compile Include="Lib\Finder\SizeDuplicate.cs" />
-    <Compile Include="Lib\IGetDuplicate.cs" />
+    <Compile Include="Lib\Detail\Utils.cs" />
+    <Compile Include="Lib\Detail\NativeMethods.cs" />
+    <Compile Include="Lib\IPluginUtil.cs" />
+    <Compile Include="Lib\Plugin\DuplicateFinder\Md5Duplicate.cs" />
+    <Compile Include="Lib\Plugin\DuplicateFinder\NameDuplicate.cs" />
+    <Compile Include="Lib\Plugin\DuplicateFinder\DuplicateFinderBase.cs" />
+    <Compile Include="Lib\Plugin\DuplicateFinder\SizeDuplicate.cs" />
+    <Compile Include="Lib\PluginUtil.cs" />
     <Compile Include="Lib\Detail\GroupingKeyConverter.cs" />
-    <Compile Include="Lib\Finder\FinderFactory.cs" />
+    <Compile Include="Lib\IPlugin.cs" />
+    <Compile Include="Lib\CatalogHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GUI.resx">
@@ -124,6 +128,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

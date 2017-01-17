@@ -1,11 +1,11 @@
 ﻿using MakeUnique.Lib;
 using MakeUnique.Lib.Detail;
-using MakeUnique.Lib.Finder;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Composition;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -18,30 +18,93 @@ using System.Windows.Forms;
 
 namespace MakeUnique
 {
+    // 并不是什么有用的类库，有时候用到这些功能而网上下载的不太满意就弄个
+    // 这个界面是用来测试的有点乱
     public partial class GUI : Form
     {
+        [Import(typeof(IPluginUtil))]
+        private IPluginUtil pluginUtil_;
+       
         public GUI()
         {
+            CatalogHelper.ComposeParts(this);
             InitializeComponent();
-            InitFinderButton();
-
+            InitPluginButtons();
             ClearResultView();
         }
-        private void InitFinderButton()
+        private void InitPluginButtons()
         {
             toolStrip_Dir.SuspendLayout();
-            toolStripDropDownButton_Find.DropDownItems.Clear();
-            foreach (var item in FinderFactory.GetDuplicateFinders())
+            pluginButtons.DropDownItems.Clear();
+            foreach (var item in pluginUtil_.GetPlugins())
             {
-                var tmp = toolStripDropDownButton_Find.DropDownItems.Add(item.Name);
-                tmp.Click += async (sender, e) =>
-                {
-                    await FindFiles(item);
-                };
+                pluginButtons.DropDownItems.Add(item.Name).Click +=
+                    async (sender, e) => await OnPluginClick(item);
             }
-
             toolStrip_Dir.ResumeLayout();
+        }
+        private bool IsIncludeSub { get { return toolStripButton_IncludeSub.Checked; } }
+        private string Pattern
+        {
+            get
+            {
+                var result = toolStripTextBox_Filter.Text.Trim();
+                return string.IsNullOrEmpty(result) ? "*" : result;
+            }
+        }
 
+
+
+        private async Task OnPluginClick(IPlugin plugin)
+        {
+            try
+            {
+                BeginFind();
+                var result = pluginUtil_.Do(plugin, Pattern, IsIncludeSub);
+                if (result != null)
+                {
+                    await Output(result);
+                }
+            }
+            finally
+            {
+                EndFind();
+            }
+        }
+
+        public async Task Output(ParallelQuery<IGrouping<string, string>> resultQuery)
+        {
+            ConcurrentDictionary<string, ConcurrentBag<string>> result = new ConcurrentDictionary<string, ConcurrentBag<string>>();
+
+            await Task.Run(() =>
+            {
+                try
+                {
+                    var files = resultQuery.WithCancellation(cancel_.Token);
+                    files.ForAll((item) =>
+                        result.AddOrUpdate(
+                            item.Key,
+                            (str) => new ConcurrentBag<string>(item),
+                            (str, bag) =>
+                            {
+                                foreach (var path in item)
+                                {
+                                    bag.Add(path);
+                                }
+                                return bag;
+                            })
+                    );
+                }
+                catch (OperationCanceledException)
+                {
+                    Invoke(new Action(() => MessageBox.Show(this, "查找过程由用户取消")));
+                }
+                catch (Exception exc)
+                {
+                    Invoke(new Action(() => MessageBox.Show(this, exc.InnerException.Message, exc.Message)));
+                }
+            });
+            await AddGroup(result);
         }
 
         private void LockDirList()
@@ -62,11 +125,11 @@ namespace MakeUnique
         }
         private void LockFindButton()
         {
-            toolStripDropDownButton_Find.Enabled = false;
+            pluginButtons.Enabled = false;
         }
         private void UnLockFindButton()
         {
-            toolStripDropDownButton_Find.Enabled = true;
+            pluginButtons.Enabled = true;
         }
         private void ShowProgess()
         {
@@ -91,34 +154,57 @@ namespace MakeUnique
             toolStripProgressBar.Value = 0;
         }
 
-
-        private DuplicateFileFinder finder_ = new DuplicateFileFinder();
         private CancellationTokenSource cancel_;
         private void OnAddDirButtonClick(object sender, EventArgs e)
         {
             if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
-                AddDir(folderBrowserDialog.SelectedPath);
+                Add(folderBrowserDialog.SelectedPath);
             }
         }
 
-        private void AddDir(string path)
+        private void OnAddFileButtonClick(object sender, EventArgs e)
         {
-            if (Directory.Exists(path) && finder_.Add(path))
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                Add(openFileDialog.FileNames);
+            }
+        }
+        private static bool IsPathExist(string path)
+        {
+            return (Directory.Exists(path) || File.Exists(path));
+        }
+        private void Add(string path)
+        {
+            if (IsPathExist(path) && pluginUtil_.Add(path))
             {
                 UpdateDirListSize();
             }
         }
-
+        private void Add(string[] path)
+        {
+            bool needUpdate = false;
+            foreach (var item in path)
+            {
+                if (IsPathExist(item) && pluginUtil_.Add(item))
+                {
+                    needUpdate = true;
+                }
+            }
+            if (needUpdate)
+            {
+                UpdateDirListSize();
+            }
+        }
         private void UpdateDirListSize()
         {
-            listView_DirList.VirtualListSize = finder_.Count();
+            listView_DirList.VirtualListSize = pluginUtil_.Count;
         }
 
 
         private void OnDirListRetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
         {
-            e.Item = new ListViewItem(finder_.GetDir(e.ItemIndex));
+            e.Item = new ListViewItem(pluginUtil_.GetPath(e.ItemIndex));
         }
 
         private void OnDelDirButtonClick(object sender, EventArgs e)
@@ -128,18 +214,18 @@ namespace MakeUnique
                 return;
             }
 
-            if (listView_DirList.SelectedIndices.Count == finder_.Count())
+            if (listView_DirList.SelectedIndices.Count == pluginUtil_.Count)
             {
-                finder_.Clear();
+                pluginUtil_.Clear();
             }
             else
             {
                 List<string> select = new List<string>();
                 foreach (int item in listView_DirList.SelectedIndices)
                 {
-                    select.Add(finder_.GetDir(item));
+                    select.Add(pluginUtil_.GetPath(item));
                 }
-                select.ForEach((str) => finder_.Remove(str));
+                select.ForEach((str) => pluginUtil_.Remove(str));
             }
             UpdateDirListSize();
             listView_DirList.SelectedIndices.Clear();
@@ -164,7 +250,11 @@ namespace MakeUnique
         {
             if (listView_DupFiles.SelectedItems?.Count == 1)
             {
-                Process.Start(listView_DupFiles.SelectedItems[0].Text);
+                var path = listView_DupFiles.SelectedItems[0].Text;
+                if (IsPathExist(path))
+                {
+                    Process.Start(path);
+                }
             }
         }
 
@@ -214,10 +304,16 @@ namespace MakeUnique
 
                 foreach (var item in del)
                 {
-                    await DelFile(item.Text);
+                    await Utils.RecycleFile(item.Text);
                     StepProgess();
+                }
+                listView_DupFiles.BeginUpdate();
+                foreach (var item in del)
+                {
                     listView_DupFiles.Items.Remove(item);
                 }
+                listView_DupFiles.EndUpdate();
+
             }
             finally
             {
@@ -225,104 +321,33 @@ namespace MakeUnique
             }
         }
 
-        private static async Task DelFile(string path)
-        {
-            await Task.Run(() =>
-            {
-                try
-                {
-                    FileUtils.DeleteFile(path, false, true);
-                }
-                catch
-                {
 
-                }
-            });
-        }
-
-        private async Task FindFiles(IGetDuplicate reader)
-        {
-            if (finder_.Count() == 0)
-            {
-                return;
-            }
-            try
-            {
-                BeginFind();
-                var option = toolStripButton_IncludeSub.Checked ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-                var pattern = toolStripTextBox_Filter.Text.Trim();
-                pattern = string.IsNullOrEmpty(pattern) ? "*" : pattern;
-
-                var found = await DoFindFiles(reader, option, pattern);
-                await AddGroup(found.Item1, found.Item2);
-            }
-            finally
-            {
-                EndFind();
-            }
-        }
-
-        private async Task<Tuple<ListViewGroup[], ListViewItem[]>> DoFindFiles(IGetDuplicate reader, SearchOption option, string pattern)
-        {
-            Tuple<ListViewGroup[], ListViewItem[]> result = null;
-
-            await Task.Run(() =>
-            {
-                ConcurrentBag<ListViewGroup> grpBag = new ConcurrentBag<ListViewGroup>();
-                ConcurrentBag<ListViewItem> itemBag = new ConcurrentBag<ListViewItem>();
-                var files = finder_.GetDuplicateFiles(pattern, option, reader, cancel_);
-                try
-                {
-                    files.ForAll((item) =>
-                    {
-                        var grp = new ListViewGroup(reader.ConvertGroupKey(item.Key));
-
-                        foreach (var str in item)
-                        {
-                            var listviewItem = new ListViewItem(str, grp);
-                            grp.Items.Add(listviewItem);
-                            itemBag.Add(listviewItem);
-                        }
-                        grpBag.Add(grp);
-                    });
-                }
-                catch (OperationCanceledException)
-                {
-                    Invoke(new Action(() =>
-                    {
-                        MessageBox.Show(this, "查找过程由用户取消");
-                    }));
-                }
-                catch (Exception exc)
-                {
-                    Invoke(new Action(() =>
-                    {
-                        MessageBox.Show(this, exc.InnerException.Message, exc.Message);
-                    }));
-                }
-                finally
-                {
-                    result = new Tuple<ListViewGroup[], ListViewItem[]>(grpBag.ToArray(), itemBag.ToArray());
-                }
-            });
-            return result;
-        }
-
-        private async Task AddGroup(ListViewGroup[] grps, ListViewItem[] items)
+        private async Task AddGroup(ConcurrentDictionary<string, ConcurrentBag<string>> grps)
         {
             // FIX: 虚拟模式不能用组吗？这样几千个文件的时候会卡
             // 这里消耗时间甚至比搜索时间要多,如果不能用组，只能换一种表示方式了
             var asyncResult = listView_DupFiles.BeginInvoke(new Action(() =>
             {
                 listView_DupFiles.BeginUpdate();
-                listView_DupFiles.Groups.AddRange(grps);
                 //listView_DupFiles.VirtualMode = true;
                 //listView_DupFiles.RetrieveVirtualItem += (sender, e) =>
                 //{
                 //    e.Item = itemBag[e.ItemIndex];
                 //};
                 //listView_DupFiles.VirtualListSize = itemBag.Length;
-                listView_DupFiles.Items.AddRange(items);
+                // listView_DupFiles.Items.AddRange(items);
+                foreach (var grpItem in grps)
+                {
+                    // FIX: 这样速度不快，但是AddRange会有奇怪的并组显示问题
+                    ListViewGroup grp = new ListViewGroup(grpItem.Key);
+
+                    listView_DupFiles.Groups.Add(grp);
+                    foreach (var item in grpItem.Value)
+                    {
+                        listView_DupFiles.Items.Add(new ListViewItem(item, grp));
+                    }
+
+                }
                 listView_DupFiles.EndUpdate();
             }));
             await Task.Run(() => { asyncResult.AsyncWaitHandle.WaitOne(); });
@@ -331,7 +356,7 @@ namespace MakeUnique
         private void BeginFind()
         {
             cancel_ = new CancellationTokenSource();
-            toolStripDropDownButton_Find.Visible = false;
+            pluginButtons.Visible = false;
             toolStripButton_Cancel.Text = "按Esc取消";
             toolStripButton_Cancel.Visible = true;
 
@@ -347,7 +372,7 @@ namespace MakeUnique
         private void EndFind()
         {
             cancel_ = null;
-            toolStripDropDownButton_Find.Visible = true;
+            pluginButtons.Visible = true;
             toolStripButton_Cancel.Visible = false;
 
             HideProgess();
@@ -357,10 +382,6 @@ namespace MakeUnique
             Text = $"找到 {listView_DupFiles.Groups.Count}个重复，共 {listView_DupFiles.Items.Count} 个文件";
             toolStripProgressBar.Style = ProgressBarStyle.Blocks;
         }
-
-
-
-
 
         private void ForAllDuplicateGroups(Action<ListViewGroup> grpCallback, Action<ListViewItem> itemCallback)
         {
@@ -434,11 +455,7 @@ namespace MakeUnique
         private void OnDirListDragDrop(object sender, DragEventArgs e)
         {
             var data = (string[])e.Data.GetData(DataFormats.FileDrop);
-
-            foreach (var item in data)
-            {
-                AddDir(item);
-            }
+            Add(data);
         }
 
         private void OnDirListDragEnter(object sender, DragEventArgs e)
@@ -448,5 +465,7 @@ namespace MakeUnique
                 e.Effect = DragDropEffects.Link;
             }
         }
+
+
     }
 }

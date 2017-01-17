@@ -34,14 +34,16 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.toolStrip_Dir = new System.Windows.Forms.ToolStrip();
-            this.toolStripButton_Add = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton_Add = new System.Windows.Forms.ToolStripDropDownButton();
+            this.文件夹ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripButton_Del = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButton_IncludeSub = new System.Windows.Forms.ToolStripButton();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripTextBox_Filter = new System.Windows.Forms.ToolStripTextBox();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripDropDownButton_Find = new System.Windows.Forms.ToolStripDropDownButton();
+            this.pluginButtons = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolStripButton_Cancel = new System.Windows.Forms.ToolStripButton();
             this.listView_DirList = new System.Windows.Forms.ListView();
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -61,6 +63,7 @@
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -145,7 +148,7 @@
             this.toolStripLabel2,
             this.toolStripTextBox_Filter,
             this.toolStripSeparator1,
-            this.toolStripDropDownButton_Find,
+            this.pluginButtons,
             this.toolStripButton_Cancel});
             this.toolStrip_Dir.Location = new System.Drawing.Point(0, 0);
             this.toolStrip_Dir.Name = "toolStrip_Dir";
@@ -157,12 +160,28 @@
             // toolStripButton_Add
             // 
             this.toolStripButton_Add.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton_Add.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.文件夹ToolStripMenuItem,
+            this.文件ToolStripMenuItem});
             this.toolStripButton_Add.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_Add.Image")));
             this.toolStripButton_Add.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton_Add.Name = "toolStripButton_Add";
-            this.toolStripButton_Add.Size = new System.Drawing.Size(43, 24);
+            this.toolStripButton_Add.Size = new System.Drawing.Size(53, 24);
             this.toolStripButton_Add.Text = "添加";
-            this.toolStripButton_Add.Click += new System.EventHandler(this.OnAddDirButtonClick);
+            // 
+            // 文件夹ToolStripMenuItem
+            // 
+            this.文件夹ToolStripMenuItem.Name = "文件夹ToolStripMenuItem";
+            this.文件夹ToolStripMenuItem.Size = new System.Drawing.Size(129, 26);
+            this.文件夹ToolStripMenuItem.Text = "文件夹";
+            this.文件夹ToolStripMenuItem.Click += new System.EventHandler(this.OnAddDirButtonClick);
+            // 
+            // 文件ToolStripMenuItem
+            // 
+            this.文件ToolStripMenuItem.Name = "文件ToolStripMenuItem";
+            this.文件ToolStripMenuItem.Size = new System.Drawing.Size(129, 26);
+            this.文件ToolStripMenuItem.Text = "文件";
+            this.文件ToolStripMenuItem.Click += new System.EventHandler(this.OnAddFileButtonClick);
             // 
             // toolStripButton_Del
             // 
@@ -208,14 +227,14 @@
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
             // 
-            // toolStripDropDownButton_Find
+            // pluginButtons
             // 
-            this.toolStripDropDownButton_Find.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton_Find.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton_Find.Image")));
-            this.toolStripDropDownButton_Find.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton_Find.Name = "toolStripDropDownButton_Find";
-            this.toolStripDropDownButton_Find.Size = new System.Drawing.Size(83, 24);
-            this.toolStripDropDownButton_Find.Text = "查找重复";
+            this.pluginButtons.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.pluginButtons.Image = ((System.Drawing.Image)(resources.GetObject("pluginButtons.Image")));
+            this.pluginButtons.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.pluginButtons.Name = "pluginButtons";
+            this.pluginButtons.Size = new System.Drawing.Size(53, 24);
+            this.pluginButtons.Text = "任务";
             // 
             // toolStripButton_Cancel
             // 
@@ -251,7 +270,7 @@
             // 
             // columnHeader2
             // 
-            this.columnHeader2.Text = "文件夹列表";
+            this.columnHeader2.Text = "文件/文件夹列表";
             this.columnHeader2.Width = 389;
             // 
             // tableLayoutPanel2
@@ -412,6 +431,10 @@
             this.folderBrowserDialog.Description = "选择要查找重复文件的文件夹";
             this.folderBrowserDialog.ShowNewFolderButton = false;
             // 
+            // openFileDialog
+            // 
+            this.openFileDialog.FileName = "openFileDialog1";
+            // 
             // GUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
@@ -455,7 +478,6 @@
         private System.Windows.Forms.ListView listView_DirList;
         private System.Windows.Forms.ToolStrip toolStrip_Dir;
         private System.Windows.Forms.ToolStrip toolStrip_File;
-        private System.Windows.Forms.ToolStripButton toolStripButton_Add;
         private System.Windows.Forms.ToolStripButton toolStripButton_Del;
         private System.Windows.Forms.ToolStripButton toolStripButton_RemoveFile;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
@@ -468,7 +490,7 @@
         private System.Windows.Forms.ToolStripButton toolStripButton_IncludeSub;
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;
         private System.Windows.Forms.ToolStripTextBox toolStripTextBox_Filter;
-        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton_Find;
+        private System.Windows.Forms.ToolStripDropDownButton pluginButtons;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripButton toolStripButton_Clear;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
@@ -479,6 +501,10 @@
         private System.Windows.Forms.ToolStripButton toolStripButton_Search;
         private System.Windows.Forms.ToolStripButton toolStripButton_Cancel;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripButton_Add;
+        private System.Windows.Forms.ToolStripMenuItem 文件夹ToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem 文件ToolStripMenuItem;
+        private System.Windows.Forms.OpenFileDialog openFileDialog;
     }
 }
 
