@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DataRowConvert
 {
-    // 这个方式比直接写文本代码需要写的还多
+    // 这个方式比直接写文本代码需要写的还多, 还是喜欢直接用文本代码, 但是这样写看起来比较专业...
     public static class ConvertorCodeDom
     {
         public static object GenerateConvertor<TResult>()
@@ -44,14 +44,14 @@ namespace DataRowConvert
             //var sr = new StreamReader(ms);
             //var code = sr.ReadToEnd();
 
-            var cmp = provider.CompileAssemblyFromDom(new CompilerParameters() { GenerateInMemory = true }, ccu);
+            var cmp = provider_.CompileAssemblyFromDom(new CompilerParameters() { GenerateInMemory = true }, ccu);
             var assembly = cmp.CompiledAssembly;
             return assembly.CreateInstance(className_);
         }
 
         private static IEnumerable<string> GetReferencedAssemblies(Type resultType)
         {
-            return refAssemblyNames.Concat(
+            return refAssemblyNames_.Concat(
                 from item in resultType.Assembly.Modules
                 select item.Name).Concat(
                 from item in resultType.GetProperties().SelectMany((prop) => prop.PropertyType.Assembly.Modules)
@@ -155,9 +155,9 @@ namespace DataRowConvert
                         property.PropertyType
                     )).ToList();
         }
-        private static CodeDomProvider provider = CodeDomProvider.CreateProvider("CSharp");
+        private static CodeDomProvider provider_ = CodeDomProvider.CreateProvider("CSharp");
         private static string className_ = "Ignore";
-        private static string[] refAssemblyNames =
+        private static string[] refAssemblyNames_ =
         {
             "System.dll",
             typeof(DataRow).Module.Name,

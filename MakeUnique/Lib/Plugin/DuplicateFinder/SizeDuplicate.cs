@@ -1,44 +1,46 @@
 ﻿using MakeUnique.Lib.Detail;
+using MakeUnique.Lib.Util;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
 using System.Text;
 
 namespace MakeUnique.Lib.Plugin.DuplicateFinder
 {
-    class SizeDuplicate : DuplicateFinderBase
+    class SizeDuplicate : PluginBase<long>
     {
-        private static string grpName_ = "文件大小";
-        protected override string GroupName
+        public const string GrpName = "文件大小";
+        public override string Name { get; } = "查找重复 (" + GrpName + ")";
+
+        internal protected override ParallelQuery<IGrouping<long, string>> PluginDo(HashSet<string> files)
         {
-            get
+            return from path in files.AsParallel().AsUnordered()
+                   let size = GetFileSize(path)
+                   where size >= 0
+                   group path by size into result
+                   where result.Count() > 1
+                   select result;
+        }
+        // 发生错误返回-1
+        public static long GetFileSize(string path)
+        {
+            try
             {
-                return grpName_;
+                return Utils.GetFileSize(path);
+            }
+            catch (Exception)
+            {
+                return -1;
             }
         }
-
-        protected ParallelQuery<IGrouping<long, string>> GroupingFiles(HashSet<string> files)
-        {
-            return (from fileName in files.AsParallel()
-                    group fileName by Utils.GetFileSize(fileName) into grp
-                    where grp.Count() > 1
-                    select grp).AsUnordered();
-        }
-
         
-        
-        public override ParallelQuery<IGrouping<string, string>> Do(HashSet<string> inputFiles)
-        {
-            return (from grp in GroupingFiles(inputFiles)
-                    select new GroupingKeyConverter<long, string, string>(grp, keyConvertFunc) as IGrouping<string, string>).AsUnordered();
-        }
-
-        private Func<long, string> keyConvertFunc = (size) =>
+        internal protected override string GroupNameConvert(long key)
         {
             StringBuilder sb = new StringBuilder(32);
-            NativeMethods.StrFormatByteSizeW(size, sb, sb.Capacity);
-            return $"{grpName_}: {sb.ToString()}";
-        };
-
+            NativeMethods.StrFormatByteSizeW(key, sb, sb.Capacity);
+            return $"{GrpName}: {sb.ToString()} ({Convert.ToString(key)} Bytes)";
+        }
+        
     }
 }

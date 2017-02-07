@@ -1,5 +1,7 @@
 ﻿using MakeUnique.Lib;
 using MakeUnique.Lib.Detail;
+using MakeUnique.Lib.Plugin;
+using MakeUnique.Lib.Util;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -12,6 +14,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,27 +25,207 @@ namespace MakeUnique
     // 这个界面是用来测试的有点乱
     public partial class GUI : Form
     {
-        [Import(typeof(IPluginUtil))]
-        private IPluginUtil pluginUtil_;
-       
+        [Import(typeof(IPathManager))]
+        private IPathManager pathManager_;
+
+
+        [Import(typeof(IPluginManager))]
+        private IPluginManager pluginManager_;
+
+        private CancellationTokenSource cancel_ = null;
+        private Action do_ = null;
         public GUI()
         {
-            CatalogHelper.ComposeParts(this);
             InitializeComponent();
-            InitPluginButtons();
-            ClearResultView();
+            InitializePlugin();
+            InitializePluginMenu();
+            HideProgressBar();
         }
-        private void InitPluginButtons()
+
+        void InitializePlugin()
         {
-            toolStrip_Dir.SuspendLayout();
-            pluginButtons.DropDownItems.Clear();
-            foreach (var item in pluginUtil_.GetPlugins())
+            try
             {
-                pluginButtons.DropDownItems.Add(item.Name).Click +=
-                    async (sender, e) => await OnPluginClick(item);
+                CatalogHelper.ComposeParts(this);
+                if (pathManager_ != null && pluginManager_ != null)
+                {
+                    return;
+                }
+                throw new ApplicationException("无法初始化");
             }
-            toolStrip_Dir.ResumeLayout();
+            catch (Exception e)
+            {
+                MessageBox.Show(this, e.Message, "插件载入失败");
+            }
+
+            Application.Exit();
         }
+
+        private void InitializePluginMenu()
+        {
+            var menu = new List<Tuple<string, EventHandler>>();
+            foreach (var item in from p in pluginManager_.Plugins select p.Value)
+            {
+                menu.Add(new Tuple<string, EventHandler>(item.Name, GetPluginButtonClickHandler(item)));
+            }
+            SuspendLayout();
+            foreach (var item in menu)
+            {
+                toolStripDropDownButton_plugin.DropDownItems.Add(item.Item1, null, item.Item2);
+            }
+            ResumeLayout();
+        }
+
+        private EventHandler GetPluginButtonClickHandler(IPlugin plugin)
+        {
+            return async (sender, obj) =>
+            {
+                try
+                {
+                    await Begin();
+                    var token = cancel_.Token;
+                    var files = await GetFiles(token);
+                    var result = await plugin.MakeGroup(files, token);
+                    await DisplayResult(result);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message);
+                }
+                finally
+                {
+                    // 设置结果列表的右键菜单的执行方式
+                    SetDoFunc(plugin);
+                    End();
+                }
+            };
+        }
+
+        private void SetDoFunc(IPlugin plugin)
+        {
+            var cmdName = plugin.CommandName;
+            if (string.IsNullOrEmpty(cmdName))
+            {
+                doToolStripMenuItem.Visible = false;
+                do_ = null;
+            }
+            else
+            {
+                doToolStripMenuItem.Visible = true;
+                doToolStripMenuItem.Text = cmdName;
+                do_ = async () =>
+                {
+                    LockUI();
+                    SetStatusText("处理中");
+                    var files = (from ListViewItem item in listView_result.Items
+                                 where item.Checked
+                                 select item.Text).ToList();
+                    var result = await plugin.Do(files);
+                    if (result)
+                    {
+                        BeginUpdateResultView();
+                        // 清掉处理过的文件列表
+                        await ForEachResult(item => item.Checked, item => item.Remove());
+                        EndUpdateResultView();
+                    }
+                    SetStatusText(string.Empty);
+                    UnlockUI();
+                };
+            }
+        }
+
+
+        private async Task<HashSet<string>> GetFiles(CancellationToken token)
+        {
+            return await pathManager_.GetFiles(Pattern,
+                IsIncludeSub ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly,
+                token);
+        }
+
+        #region 输入列表控制
+        private void OnPathViewRetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
+        {
+            e.Item = new ListViewItem(pathManager_.ElementAt(e.ItemIndex));
+        }
+
+        private void OnPathDragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Link;
+            }
+        }
+
+        private void OnPathDragDrop(object sender, DragEventArgs e)
+        {
+            AddPath((string[])e.Data.GetData(DataFormats.FileDrop));
+        }
+        private void AddPath(params string[] path)
+        {
+            bool needUpdate = false;
+            foreach (var item in path)
+            {
+                if (pathManager_.Add(item))
+                {
+                    needUpdate = true;
+                }
+            }
+            if (needUpdate)
+            {
+                UpdatePathListSize();
+            }
+        }
+        private void ClearPath()
+        {
+            pathManager_.Clear();
+            UpdatePathListSize();
+        }
+        private void UpdatePathListSize()
+        {
+            listView_path.VirtualListSize = pathManager_.Count;
+            listView_path.SelectedIndices.Clear();
+        }
+
+        private void OnAddPathButtonClick(object sender, EventArgs e)
+        {
+            if (openFileDialog_path.ShowDialog() == DialogResult.OK)
+            {
+                AddPath(openFileDialog_path.FileNames);
+            }
+        }
+
+        private void OnRemovePathButtonClick(object sender, EventArgs e)
+        {
+            var selectedCount = listView_path.SelectedIndices.Count;
+            if (selectedCount == 0)
+            {
+                return;
+            }
+            if (selectedCount == pathManager_.Count)
+            {
+                ClearPath();
+            }
+            else
+            {
+
+                var selectedPaths = (from int i in listView_path.SelectedIndices
+                                     select pathManager_.ElementAt(i)).ToList();
+                foreach (var item in selectedPaths)
+                {
+                    pathManager_.Remove(item);
+                }
+            }
+            UpdatePathListSize();
+        }
+
+        private void OnClearPathButtonClick(object sender, EventArgs e)
+        {
+            ClearPath();
+        }
+
+        #endregion
+
+        #region 基本界面控制
         private bool IsIncludeSub { get { return toolStripButton_IncludeSub.Checked; } }
         private string Pattern
         {
@@ -52,420 +235,355 @@ namespace MakeUnique
                 return string.IsNullOrEmpty(result) ? "*" : result;
             }
         }
-
-
-
-        private async Task OnPluginClick(IPlugin plugin)
-        {
-            try
-            {
-                BeginFind();
-                var result = pluginUtil_.Do(plugin, Pattern, IsIncludeSub);
-                if (result != null)
-                {
-                    await Output(result);
-                }
-            }
-            finally
-            {
-                EndFind();
-            }
-        }
-
-        public async Task Output(ParallelQuery<IGrouping<string, string>> resultQuery)
-        {
-            ConcurrentDictionary<string, ConcurrentBag<string>> result = new ConcurrentDictionary<string, ConcurrentBag<string>>();
-
-            await Task.Run(() =>
-            {
-                try
-                {
-                    var files = resultQuery.WithCancellation(cancel_.Token);
-                    files.ForAll((item) =>
-                        result.AddOrUpdate(
-                            item.Key,
-                            (str) => new ConcurrentBag<string>(item),
-                            (str, bag) =>
-                            {
-                                foreach (var path in item)
-                                {
-                                    bag.Add(path);
-                                }
-                                return bag;
-                            })
-                    );
-                }
-                catch (OperationCanceledException)
-                {
-                    Invoke(new Action(() => MessageBox.Show(this, "查找过程由用户取消")));
-                }
-                catch (Exception exc)
-                {
-                    Invoke(new Action(() => MessageBox.Show(this, exc.InnerException.Message, exc.Message)));
-                }
-            });
-            await AddGroup(result);
-        }
-
-        private void LockDirList()
-        {
-            splitContainer1.Panel1.Enabled = false;
-        }
-        private void LockResultList()
-        {
-            splitContainer1.Panel2.Enabled = false;
-        }
-        private void UnLockDirList()
-        {
-            splitContainer1.Panel1.Enabled = true;
-        }
-        private void UnLockResultList()
-        {
-            splitContainer1.Panel2.Enabled = true;
-        }
-        private void LockFindButton()
-        {
-            pluginButtons.Enabled = false;
-        }
-        private void UnLockFindButton()
-        {
-            pluginButtons.Enabled = true;
-        }
-        private void ShowProgess()
-        {
-            toolStripProgressBar.Visible = true;
-        }
-        private void HideProgess()
-        {
-            toolStripProgressBar.Visible = false;
-        }
-        private void StepProgess()
-        {
-            toolStripProgressBar.PerformStep();
-        }
-
-        private void SetMaxProgress(int val)
-        {
-            toolStripProgressBar.Maximum = val;
-        }
-
-        private void ClearProgress()
-        {
-            toolStripProgressBar.Value = 0;
-        }
-
-        private CancellationTokenSource cancel_;
-        private void OnAddDirButtonClick(object sender, EventArgs e)
-        {
-            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
-            {
-                Add(folderBrowserDialog.SelectedPath);
-            }
-        }
-
-        private void OnAddFileButtonClick(object sender, EventArgs e)
-        {
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                Add(openFileDialog.FileNames);
-            }
-        }
-        private static bool IsPathExist(string path)
-        {
-            return (Directory.Exists(path) || File.Exists(path));
-        }
-        private void Add(string path)
-        {
-            if (IsPathExist(path) && pluginUtil_.Add(path))
-            {
-                UpdateDirListSize();
-            }
-        }
-        private void Add(string[] path)
-        {
-            bool needUpdate = false;
-            foreach (var item in path)
-            {
-                if (IsPathExist(item) && pluginUtil_.Add(item))
-                {
-                    needUpdate = true;
-                }
-            }
-            if (needUpdate)
-            {
-                UpdateDirListSize();
-            }
-        }
-        private void UpdateDirListSize()
-        {
-            listView_DirList.VirtualListSize = pluginUtil_.Count;
-        }
-
-
-        private void OnDirListRetrieveVirtualItem(object sender, RetrieveVirtualItemEventArgs e)
-        {
-            e.Item = new ListViewItem(pluginUtil_.GetPath(e.ItemIndex));
-        }
-
-        private void OnDelDirButtonClick(object sender, EventArgs e)
-        {
-            if (listView_DirList.SelectedIndices.Count == 0)
-            {
-                return;
-            }
-
-            if (listView_DirList.SelectedIndices.Count == pluginUtil_.Count)
-            {
-                pluginUtil_.Clear();
-            }
-            else
-            {
-                List<string> select = new List<string>();
-                foreach (int item in listView_DirList.SelectedIndices)
-                {
-                    select.Add(pluginUtil_.GetPath(item));
-                }
-                select.ForEach((str) => pluginUtil_.Remove(str));
-            }
-            UpdateDirListSize();
-            listView_DirList.SelectedIndices.Clear();
-        }
-
-
-
-        private void ClearResultView()
-        {
-            Text = string.Empty;
-            listView_DupFiles.Items.Clear();
-            listView_DupFiles.Groups.Clear();
-        }
-
-        private void OnClearResultButtonClick(object sender, EventArgs e)
-        {
-            ClearResultView();
-        }
-
-
-        private void OnResultItemDoubleClick(object sender, EventArgs e)
-        {
-            if (listView_DupFiles.SelectedItems?.Count == 1)
-            {
-                var path = listView_DupFiles.SelectedItems[0].Text;
-                if (IsPathExist(path))
-                {
-                    Process.Start(path);
-                }
-            }
-        }
-
-        private void OnSelectResultButtonClick(object sender, EventArgs e)
-        {
-            ForAllDuplicateGroups((val) => { val.Items[0].Checked = false; }, (val) => { val.Checked = true; });
-        }
-
-
-        private bool CheckSelect()
-        {
-            return !listView_DupFiles.Groups.Cast<ListViewGroup>().Any((grp) =>
-                grp.Items.Cast<ListViewItem>().All((item) => item.Checked));
-        }
-        private void EndRemove()
-        {
-            HideProgess();
-            UnLockResultList();
-            UnLockDirList();
-        }
-
-        private void BeginRemove()
-        {
-            LockResultList();
-            LockDirList();
-            ClearProgress();
-            ShowProgess();
-        }
-
-        private async void OnRemoveFileButtonClick(object sender, EventArgs e)
-        {
-            // 检查选择项
-            if (!CheckSelect())
-            {
-                if (MessageBox.Show("确定删除同一特征的所有文件？", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
-                {
-                    return;
-                }
-            }
-
-            try
-            {
-                BeginRemove();
-                var del = listView_DupFiles.CheckedItems.Cast<ListViewItem>();
-
-                SetMaxProgress(del.Count());
-
-                foreach (var item in del)
-                {
-                    await Utils.RecycleFile(item.Text);
-                    StepProgess();
-                }
-                listView_DupFiles.BeginUpdate();
-                foreach (var item in del)
-                {
-                    listView_DupFiles.Items.Remove(item);
-                }
-                listView_DupFiles.EndUpdate();
-
-            }
-            finally
-            {
-                EndRemove();
-            }
-        }
-
-
-        private async Task AddGroup(ConcurrentDictionary<string, ConcurrentBag<string>> grps)
-        {
-            // FIX: 虚拟模式不能用组吗？这样几千个文件的时候会卡
-            // 这里消耗时间甚至比搜索时间要多,如果不能用组，只能换一种表示方式了
-            var asyncResult = listView_DupFiles.BeginInvoke(new Action(() =>
-            {
-                listView_DupFiles.BeginUpdate();
-                //listView_DupFiles.VirtualMode = true;
-                //listView_DupFiles.RetrieveVirtualItem += (sender, e) =>
-                //{
-                //    e.Item = itemBag[e.ItemIndex];
-                //};
-                //listView_DupFiles.VirtualListSize = itemBag.Length;
-                // listView_DupFiles.Items.AddRange(items);
-                foreach (var grpItem in grps)
-                {
-                    // FIX: 这样速度不快，但是AddRange会有奇怪的并组显示问题
-                    ListViewGroup grp = new ListViewGroup(grpItem.Key);
-
-                    listView_DupFiles.Groups.Add(grp);
-                    foreach (var item in grpItem.Value)
-                    {
-                        listView_DupFiles.Items.Add(new ListViewItem(item, grp));
-                    }
-
-                }
-                listView_DupFiles.EndUpdate();
-            }));
-            await Task.Run(() => { asyncResult.AsyncWaitHandle.WaitOne(); });
-        }
-
-        private void BeginFind()
+        private async Task Begin()
         {
             cancel_ = new CancellationTokenSource();
-            pluginButtons.Visible = false;
-            toolStripButton_Cancel.Text = "按Esc取消";
-            toolStripButton_Cancel.Visible = true;
-
-            LockResultList();
-            LockDirList();
-            ClearProgress();
-            ShowProgess();
-            ClearResultView();
-
-            Text = "正在查找...";
-            toolStripProgressBar.Style = ProgressBarStyle.Marquee;
+            LockUI();
+            await ClearResult();
+            SetStatusText("按Esc终止");
+            ShowProgressBar(ProgressBarStyle.Marquee);
         }
-        private void EndFind()
+
+        private void LockUI()
         {
+            splitContainer.Enabled = false;
+        }
+
+        private async Task ClearResult()
+        {
+            var iar = BeginInvoke(new Action(() =>
+            {
+                BeginUpdateResultView();
+                listView_result.Items.Clear();
+                listView_result.Groups.Clear();
+                EndUpdateResultView();
+            }));
+            await WaitAsyncResult(iar);
+        }
+        private void End()
+        {
+            HideProgressBar();
             cancel_ = null;
-            pluginButtons.Visible = true;
-            toolStripButton_Cancel.Visible = false;
-
-            HideProgess();
-            UnLockResultList();
-            UnLockDirList();
-
-            Text = $"找到 {listView_DupFiles.Groups.Count}个重复，共 {listView_DupFiles.Items.Count} 个文件";
-            toolStripProgressBar.Style = ProgressBarStyle.Blocks;
+            UnlockUI();
+            SetStatusText($"组: {listView_result.Groups.Count} 总: {listView_result.Items.Count}");
+            listView_path.Focus();
         }
 
-        private void ForAllDuplicateGroups(Action<ListViewGroup> grpCallback, Action<ListViewItem> itemCallback)
+        private void UnlockUI()
         {
-            foreach (ListViewGroup grp in listView_DupFiles.Groups)
-            {
-                foreach (ListViewItem item in grp.Items)
-                {
-                    itemCallback?.Invoke(item);
-                }
-                grpCallback?.Invoke(grp);
-            }
-        }
-
-        private void OnAllCheckButtonClick(object sender, EventArgs e)
-        {
-            ChangeDupChecked(true);
-        }
-
-        private void OnClearCheckButtonClick(object sender, EventArgs e)
-        {
-            ChangeDupChecked(false);
-        }
-
-        private void ChangeDupChecked(bool isChecked)
-        {
-            ForAllDuplicateFiles((item) => { item.Checked = isChecked; });
-        }
-
-        private void ForAllDuplicateFiles(Action<ListViewItem> itemCallback)
-        {
-            foreach (ListViewItem item in listView_DupFiles.Items)
-            {
-                itemCallback?.Invoke(item);
-            }
-        }
-
-        private void OnSearchButtonClick(object sender, EventArgs e)
-        {
-            listView_DupFiles.SelectedItems.Clear();
-            var search = toolStripTextBox_Search.Text;
-            if (string.IsNullOrEmpty(search))
-            {
-                return;
-            }
-            ForAllDuplicateFiles((item) =>
-            {
-                if (item.Text.Contains(search))
-                {
-                    item.Selected = true;
-                }
-            });
-            listView_DupFiles.Select();
+            splitContainer.Enabled = true;
         }
 
         private void OnGUIKeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
             {
-                if (cancel_.IsCancellationRequested)
+                if (cancel_ != null)
                 {
-                    return;
-                }
-                cancel_.Cancel();
-                if (cancel_.IsCancellationRequested)
-                {
-                    toolStripButton_Cancel.Text = "正在取消";
+                    if (cancel_.IsCancellationRequested)
+                    {
+                        return;
+                    }
+                    cancel_.Cancel();
+                    if (cancel_.IsCancellationRequested)
+                    {
+                        SetStatusText("正在取消...");
+                    }
                 }
             }
         }
-
-        private void OnDirListDragDrop(object sender, DragEventArgs e)
+        private void SetStatusText(string str)
         {
-            var data = (string[])e.Data.GetData(DataFormats.FileDrop);
-            Add(data);
+            toolStripStatusLabel.Text = str;
         }
-
-        private void OnDirListDragEnter(object sender, DragEventArgs e)
+        private void ShowProgressBar(ProgressBarStyle style, int max = 100)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            toolStripProgressBar.Visible = true;
+            toolStripProgressBar.Style = style;
+            toolStripProgressBar.Maximum = max;
+        }
+        private void StepProgressBar()
+        {
+            toolStripProgressBar.PerformStep();
+        }
+        private void HideProgressBar()
+        {
+            toolStripProgressBar.Visible = false;
+        }
+        #endregion
+        private async Task WaitAsyncResult(IAsyncResult iar)
+        {
+            await Task.Run(() => iar.AsyncWaitHandle.WaitOne());
+        }
+        #region 结果列表控制
+        private async Task DisplayResult(IDictionary<string, IEnumerable<string>> result)
+        {
+            if (!result.Any())
             {
-                e.Effect = DragDropEffects.Link;
+                return;
+            }
+            var count = result.Aggregate(0, (val, item) => val + item.Value.Count());
+            ShowProgressBar(ProgressBarStyle.Continuous, count);
+
+            await ResultViewDo(() => DoDisplayResult(result));
+        }
+
+        private void DoDisplayResult(IDictionary<string, IEnumerable<string>> result)
+        {
+            BeginUpdateResultView();
+
+            foreach (var item in result)
+            {
+                var grp = new ListViewGroup(item.Key);
+                var tmpResult = from path in item.Value
+                                select new ListViewItem(path, grp);
+                listView_result.Groups.Add(grp);
+                foreach (var resItem in tmpResult)
+                {
+                    listView_result.Items.Add(resItem);
+                    StepProgressBar();
+                }
+            }
+            EndUpdateResultView();
+        }
+        #endregion
+
+
+        private void OnResultItemDoubleClick(object sender, EventArgs e)
+        {
+            if (listView_result.SelectedItems?.Count == 1)
+            {
+                var path = listView_result.SelectedItems[0].Text;
+                if (Utils.IsPathExist(path))
+                {
+                    Process.Start(path);
+                }
             }
         }
 
+        private async void copyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView_result.SelectedItems.Count == 0)
+            {
+                return;
+            }
 
+            var text = string.Empty;
+            await ResultViewDo(() => text = string.Join(Environment.NewLine, from ListViewItem item
+                                                                             in listView_result.SelectedItems
+                                                                             select item.Text));
+
+            CopyToClipboard(text);
+
+        }
+
+        private static void CopyToClipboard(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+            try
+            {
+                Clipboard.SetDataObject(text);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        private async void copyGroupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView_result.SelectedItems.Count == 0)
+            {
+                return;
+            }
+            var sb = new StringBuilder();
+            await ResultViewDo(() =>
+            {
+                HashSet<string> groupNames = new HashSet<string>();
+                foreach (ListViewItem item in listView_result.SelectedItems)
+                {
+                    var grpName = item.Group.Header;
+                    if (groupNames.Add(grpName))
+                    {
+                        if (sb.Length != 0)
+                        {
+                            sb.AppendLine();
+                        }
+                        sb.AppendLine(grpName);
+                    }
+                    sb.Append('\t');
+                    sb.AppendLine(item.Text);
+                }
+            });
+            CopyToClipboard(sb.ToString());
+        }
+
+        private async void toolStripButton_clearResult_Click(object sender, EventArgs e)
+        {
+            await ClearResult();
+            SetStatusText(string.Empty);
+        }
+
+        private async void checkAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BeginUpdateResultView();
+            await SetAllResultCheck(true, str => true);
+            EndUpdateResultView();
+        }
+
+        private async void clearCheckToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BeginUpdateResultView();
+            await ClearCheck();
+            EndUpdateResultView();
+        }
+
+        private async Task ClearCheck()
+        {
+            await SetAllResultCheck(false, str => true);
+        }
+
+        private async Task SetAllResultCheck(bool val, Predicate<string> pred)
+        {
+            await ForEachResult(item => pred(item.Text), item => item.Checked = val);
+        }
+
+        private IEnumerable<ListViewItem> SelectResults(Predicate<ListViewItem> pred)
+        {
+            return listView_result.Items.Cast<ListViewItem>().Where(i => pred(i));
+        }
+
+        private async void toolStripButton_search_Click(object sender, EventArgs e)
+        {
+            var text = toolStripTextBox_filterText.Text;
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+            BeginUpdateResultView();
+            ClearSelect();
+            var useRegex = toolStripButton_regex.Checked;
+
+            Predicate<ListViewItem> pred = null;
+            if (useRegex)
+            {
+                pred = item => Regex.IsMatch(item.Text, text);
+            }
+            else
+            {
+                pred = item => item.Text.Contains(text);
+            }
+            await ForEachResult(pred, item => item.Selected = true);
+            if (listView_result.SelectedItems.Count > 0)
+            {
+                listView_result.SelectedItems[0].EnsureVisible();
+            }
+            EndUpdateResultView();
+            listView_result.Select();
+        }
+
+        private void ClearSelect()
+        {
+            listView_result.SelectedItems.Clear();
+        }
+
+        private async Task ForEachResult(Predicate<ListViewItem> pred, Action<ListViewItem> doSth)
+        {
+            await ResultViewDo(() =>
+            {
+                foreach (var item in SelectResults(pred))
+                {
+                    doSth(item);
+                }
+            });
+        }
+
+        private async void toolStripButton_selectCheck_Click(object sender, EventArgs e)
+        {
+            BeginUpdateResultView();
+            ClearSelect();
+            await ForEachResult(item => item.Checked, item => item.Selected = true);
+            EndUpdateResultView();
+        }
+
+        private async void checkAutoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BeginUpdateResultView();
+            await ClearCheck();
+            await ResultViewDo(() =>
+            {
+                foreach (ListViewGroup grp in listView_result.Groups)
+                {
+                    foreach (var item in grp.Items.Cast<ListViewItem>().Skip(1))
+                    {
+                        item.Checked = true;
+                    }
+                }
+            });
+            EndUpdateResultView();
+        }
+
+        private async Task ResultViewDo(Action doSth)
+        {
+            await WaitAsyncResult(listView_result.BeginInvoke(doSth));
+        }
+
+        private void listView_result_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            if (e.IsSelected)
+            {
+                e.Item.BackColor = SystemColors.Highlight;
+                e.Item.ForeColor = SystemColors.HighlightText;
+            }
+            else
+            {
+                e.Item.BackColor = SystemColors.Window;
+                e.Item.ForeColor = SystemColors.WindowText;
+            }
+        }
+
+        private void doToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            do_?.Invoke();
+        }
+
+        private async void selectAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BeginUpdateResultView();
+            await ForEachResult(item => true, item => item.Selected = true);
+            EndUpdateResultView();
+        }
+
+        private void EndUpdateResultView()
+        {
+            listView_result.EndUpdate();
+        }
+
+        private void BeginUpdateResultView()
+        {
+            listView_result.BeginUpdate();
+        }
+
+        private async void invertSelectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BeginUpdateResultView();
+            await ForEachResult(item => true, item => item.Selected = !item.Selected);
+            EndUpdateResultView();
+        }
+
+        private async void invertCheckToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BeginUpdateResultView();
+            await ForEachResult(item => true, item => item.Checked = !item.Checked);
+            EndUpdateResultView();
+        }
+
+        private void clearSelectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ClearSelect();
+        }
     }
 }

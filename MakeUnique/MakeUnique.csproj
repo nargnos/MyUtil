@@ -75,17 +75,18 @@
     <Compile Include="GUI.Designer.cs">
       <DependentUpon>GUI.cs</DependentUpon>
     </Compile>
-    <Compile Include="Lib\Detail\Utils.cs" />
+    <Compile Include="Lib\Plugin\IPluginManager.cs" />
+    <Compile Include="Lib\Plugin\PluginManager.cs" />
+    <Compile Include="Lib\Util\IPathManager.cs" />
+    <Compile Include="Lib\Util\PathManager.cs" />
+    <Compile Include="Lib\Util\Utils.cs" />
     <Compile Include="Lib\Detail\NativeMethods.cs" />
-    <Compile Include="Lib\IPluginUtil.cs" />
+    <Compile Include="Lib\Plugin\IPlugin.cs" />
     <Compile Include="Lib\Plugin\DuplicateFinder\Md5Duplicate.cs" />
     <Compile Include="Lib\Plugin\DuplicateFinder\NameDuplicate.cs" />
-    <Compile Include="Lib\Plugin\DuplicateFinder\DuplicateFinderBase.cs" />
     <Compile Include="Lib\Plugin\DuplicateFinder\SizeDuplicate.cs" />
-    <Compile Include="Lib\PluginUtil.cs" />
-    <Compile Include="Lib\Detail\GroupingKeyConverter.cs" />
-    <Compile Include="Lib\IPlugin.cs" />
-    <Compile Include="Lib\CatalogHelper.cs" />
+    <Compile Include="Lib\Util\CatalogHelper.cs" />
+    <Compile Include="Lib\Plugin\PluginBase.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GUI.resx">

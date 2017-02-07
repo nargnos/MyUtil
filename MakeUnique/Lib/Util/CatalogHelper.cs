@@ -6,20 +6,24 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace MakeUnique.Lib
+namespace MakeUnique.Lib.Util
 {
     public static class CatalogHelper
     {
 
         public static string PluginPath { get; set; } = ".\\Plugins";
-       
+
         public static void ComposeParts(params object[] parts)
         {
-            container_.Value?.ComposeParts(parts);
+            // 这里如果插件实现错误的话还会有异常
+            Container?.ComposeParts(parts);
         }
+        
+        public static CompositionContainer Container { get { return container_.Value; } }
+
+
         private static Lazy<CompositionContainer> container_ = new Lazy<CompositionContainer>(() =>
         {
-            CompositionContainer result = null;
             try
             {
                 var ac = new AggregateCatalog();
@@ -28,13 +32,13 @@ namespace MakeUnique.Lib
                 {
                     ac.Catalogs.Add(new DirectoryCatalog(PluginPath));
                 }
-                result = new CompositionContainer(ac);
+                return new CompositionContainer(ac);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                System.Windows.Forms.MessageBox.Show(e.Message, "插件载入错误");
+                // 忽略初始化错误
             }
-            return result;
+            return null;
         }, true);
 
     }

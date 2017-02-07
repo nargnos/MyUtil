@@ -28,178 +28,168 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GUI));
-            this.listView_DupFiles = new System.Windows.Forms.ListView();
+            this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.listView_path = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.toolStrip_Dir = new System.Windows.Forms.ToolStrip();
-            this.toolStripButton_Add = new System.Windows.Forms.ToolStripDropDownButton();
-            this.文件夹ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.文件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripButton_Del = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton_IncludeSub = new System.Windows.Forms.ToolStripButton();
-            this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
+            this.contextMenuStrip_path = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.addToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.toolStripTextBox_Filter = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripButton_IncludeSub = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.pluginButtons = new System.Windows.Forms.ToolStripDropDownButton();
-            this.toolStripButton_Cancel = new System.Windows.Forms.ToolStripButton();
-            this.listView_DirList = new System.Windows.Forms.ListView();
+            this.toolStripDropDownButton_plugin = new System.Windows.Forms.ToolStripDropDownButton();
+            this.listView_result = new System.Windows.Forms.ListView();
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.toolStrip_File = new System.Windows.Forms.ToolStrip();
-            this.toolStripButton_RemoveFile = new System.Windows.Forms.ToolStripButton();
+            this.contextMenuStrip_result = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.copyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
+            this.doToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip2 = new System.Windows.Forms.ToolStrip();
+            this.toolStripTextBox_filterText = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripButton_regex = new System.Windows.Forms.ToolStripButton();
+            this.toolStripButton_search = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton_Clear = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton_Select = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton_ClearCheck = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton_AllCheck = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripButton_Search = new System.Windows.Forms.ToolStripButton();
-            this.toolStripTextBox_Search = new System.Windows.Forms.ToolStripTextBox();
-            this.statusStrip = new System.Windows.Forms.StatusStrip();
+            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.selectCheckToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripButton2 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.checkAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkAutoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearCheckToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripButton_clearResult = new System.Windows.Forms.ToolStripButton();
+            this.openFileDialog_path = new System.Windows.Forms.OpenFileDialog();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
-            this.folderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
-            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
-            this.splitContainer1.Panel1.SuspendLayout();
-            this.splitContainer1.Panel2.SuspendLayout();
-            this.splitContainer1.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
-            this.toolStrip_Dir.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
-            this.toolStrip_File.SuspendLayout();
-            this.statusStrip.SuspendLayout();
+            this.invertSelectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.invertCheckToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearSelectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).BeginInit();
+            this.splitContainer.Panel1.SuspendLayout();
+            this.splitContainer.Panel2.SuspendLayout();
+            this.splitContainer.SuspendLayout();
+            this.contextMenuStrip_path.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
+            this.contextMenuStrip_result.SuspendLayout();
+            this.toolStrip2.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // listView_DupFiles
+            // splitContainer
             // 
-            this.listView_DupFiles.CheckBoxes = true;
-            this.listView_DupFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.splitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.splitContainer.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
+            this.splitContainer.Location = new System.Drawing.Point(0, 0);
+            this.splitContainer.Name = "splitContainer";
+            // 
+            // splitContainer.Panel1
+            // 
+            this.splitContainer.Panel1.Controls.Add(this.listView_path);
+            this.splitContainer.Panel1.Controls.Add(this.toolStrip1);
+            // 
+            // splitContainer.Panel2
+            // 
+            this.splitContainer.Panel2.Controls.Add(this.listView_result);
+            this.splitContainer.Panel2.Controls.Add(this.toolStrip2);
+            this.splitContainer.Size = new System.Drawing.Size(1281, 561);
+            this.splitContainer.SplitterDistance = 422;
+            this.splitContainer.TabIndex = 0;
+            // 
+            // listView_path
+            // 
+            this.listView_path.AllowDrop = true;
+            this.listView_path.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
-            this.listView_DupFiles.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listView_DupFiles.FullRowSelect = true;
-            this.listView_DupFiles.GridLines = true;
-            this.listView_DupFiles.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.listView_DupFiles.Location = new System.Drawing.Point(3, 30);
-            this.listView_DupFiles.Name = "listView_DupFiles";
-            this.listView_DupFiles.ShowItemToolTips = true;
-            this.listView_DupFiles.Size = new System.Drawing.Size(873, 528);
-            this.listView_DupFiles.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.listView_DupFiles.TabIndex = 3;
-            this.listView_DupFiles.UseCompatibleStateImageBehavior = false;
-            this.listView_DupFiles.View = System.Windows.Forms.View.Details;
-            this.listView_DupFiles.DoubleClick += new System.EventHandler(this.OnResultItemDoubleClick);
+            this.listView_path.ContextMenuStrip = this.contextMenuStrip_path;
+            this.listView_path.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView_path.FullRowSelect = true;
+            this.listView_path.GridLines = true;
+            this.listView_path.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.listView_path.Location = new System.Drawing.Point(0, 27);
+            this.listView_path.Name = "listView_path";
+            this.listView_path.ShowGroups = false;
+            this.listView_path.Size = new System.Drawing.Size(422, 534);
+            this.listView_path.TabIndex = 1;
+            this.listView_path.UseCompatibleStateImageBehavior = false;
+            this.listView_path.View = System.Windows.Forms.View.Details;
+            this.listView_path.VirtualMode = true;
+            this.listView_path.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.OnPathViewRetrieveVirtualItem);
+            this.listView_path.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnPathDragDrop);
+            this.listView_path.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnPathDragEnter);
             // 
             // columnHeader1
             // 
-            this.columnHeader1.Text = "重复文件列表";
-            this.columnHeader1.Width = 850;
+            this.columnHeader1.Text = "";
+            this.columnHeader1.Width = 418;
             // 
-            // splitContainer1
+            // contextMenuStrip_path
             // 
-            this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.splitContainer1.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
-            this.splitContainer1.Location = new System.Drawing.Point(0, 0);
-            this.splitContainer1.Name = "splitContainer1";
+            this.contextMenuStrip_path.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.contextMenuStrip_path.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addToolStripMenuItem,
+            this.removeToolStripMenuItem,
+            this.clearToolStripMenuItem});
+            this.contextMenuStrip_path.Name = "contextMenuStrip_path";
+            this.contextMenuStrip_path.Size = new System.Drawing.Size(115, 82);
             // 
-            // splitContainer1.Panel1
+            // addToolStripMenuItem
             // 
-            this.splitContainer1.Panel1.Controls.Add(this.tableLayoutPanel1);
-            this.splitContainer1.Panel1MinSize = 400;
+            this.addToolStripMenuItem.Name = "addToolStripMenuItem";
+            this.addToolStripMenuItem.Size = new System.Drawing.Size(114, 26);
+            this.addToolStripMenuItem.Text = "添加";
+            this.addToolStripMenuItem.Click += new System.EventHandler(this.OnAddPathButtonClick);
             // 
-            // splitContainer1.Panel2
+            // removeToolStripMenuItem
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.tableLayoutPanel2);
-            this.splitContainer1.Panel2MinSize = 450;
-            this.splitContainer1.Size = new System.Drawing.Size(1281, 561);
-            this.splitContainer1.SplitterDistance = 400;
-            this.splitContainer1.SplitterWidth = 2;
-            this.splitContainer1.TabIndex = 9;
+            this.removeToolStripMenuItem.Name = "removeToolStripMenuItem";
+            this.removeToolStripMenuItem.Size = new System.Drawing.Size(114, 26);
+            this.removeToolStripMenuItem.Text = "删除";
+            this.removeToolStripMenuItem.Click += new System.EventHandler(this.OnRemovePathButtonClick);
             // 
-            // tableLayoutPanel1
+            // clearToolStripMenuItem
             // 
-            this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.toolStrip_Dir, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.listView_DirList, 0, 2);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(400, 561);
-            this.tableLayoutPanel1.TabIndex = 1;
+            this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(114, 26);
+            this.clearToolStripMenuItem.Text = "清空";
+            this.clearToolStripMenuItem.Click += new System.EventHandler(this.OnClearPathButtonClick);
             // 
-            // toolStrip_Dir
+            // toolStrip1
             // 
-            this.toolStrip_Dir.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.toolStrip_Dir.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.toolStrip_Dir.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton_Add,
-            this.toolStripButton_Del,
-            this.toolStripSeparator3,
-            this.toolStripButton_IncludeSub,
-            this.toolStripLabel2,
+            this.toolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripLabel1,
             this.toolStripTextBox_Filter,
+            this.toolStripButton_IncludeSub,
             this.toolStripSeparator1,
-            this.pluginButtons,
-            this.toolStripButton_Cancel});
-            this.toolStrip_Dir.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip_Dir.Name = "toolStrip_Dir";
-            this.toolStrip_Dir.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.toolStrip_Dir.Size = new System.Drawing.Size(400, 27);
-            this.toolStrip_Dir.TabIndex = 3;
-            this.toolStrip_Dir.Text = "toolStrip1";
+            this.toolStripDropDownButton_plugin});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(422, 27);
+            this.toolStrip1.TabIndex = 0;
+            this.toolStrip1.Text = "toolStrip1";
             // 
-            // toolStripButton_Add
+            // toolStripLabel1
             // 
-            this.toolStripButton_Add.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton_Add.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.文件夹ToolStripMenuItem,
-            this.文件ToolStripMenuItem});
-            this.toolStripButton_Add.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_Add.Image")));
-            this.toolStripButton_Add.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton_Add.Name = "toolStripButton_Add";
-            this.toolStripButton_Add.Size = new System.Drawing.Size(53, 24);
-            this.toolStripButton_Add.Text = "添加";
+            this.toolStripLabel1.Name = "toolStripLabel1";
+            this.toolStripLabel1.Size = new System.Drawing.Size(69, 24);
+            this.toolStripLabel1.Text = "文件过滤";
             // 
-            // 文件夹ToolStripMenuItem
+            // toolStripTextBox_Filter
             // 
-            this.文件夹ToolStripMenuItem.Name = "文件夹ToolStripMenuItem";
-            this.文件夹ToolStripMenuItem.Size = new System.Drawing.Size(129, 26);
-            this.文件夹ToolStripMenuItem.Text = "文件夹";
-            this.文件夹ToolStripMenuItem.Click += new System.EventHandler(this.OnAddDirButtonClick);
-            // 
-            // 文件ToolStripMenuItem
-            // 
-            this.文件ToolStripMenuItem.Name = "文件ToolStripMenuItem";
-            this.文件ToolStripMenuItem.Size = new System.Drawing.Size(129, 26);
-            this.文件ToolStripMenuItem.Text = "文件";
-            this.文件ToolStripMenuItem.Click += new System.EventHandler(this.OnAddFileButtonClick);
-            // 
-            // toolStripButton_Del
-            // 
-            this.toolStripButton_Del.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton_Del.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_Del.Image")));
-            this.toolStripButton_Del.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton_Del.Name = "toolStripButton_Del";
-            this.toolStripButton_Del.Size = new System.Drawing.Size(43, 24);
-            this.toolStripButton_Del.Text = "删除";
-            this.toolStripButton_Del.Click += new System.EventHandler(this.OnDelDirButtonClick);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 27);
+            this.toolStripTextBox_Filter.Name = "toolStripTextBox_Filter";
+            this.toolStripTextBox_Filter.Size = new System.Drawing.Size(100, 27);
             // 
             // toolStripButton_IncludeSub
             // 
+            this.toolStripButton_IncludeSub.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.toolStripButton_IncludeSub.Checked = true;
             this.toolStripButton_IncludeSub.CheckOnClick = true;
             this.toolStripButton_IncludeSub.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -207,233 +197,260 @@
             this.toolStripButton_IncludeSub.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_IncludeSub.Image")));
             this.toolStripButton_IncludeSub.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton_IncludeSub.Name = "toolStripButton_IncludeSub";
-            this.toolStripButton_IncludeSub.Size = new System.Drawing.Size(73, 24);
-            this.toolStripButton_IncludeSub.Text = "包含子级";
-            // 
-            // toolStripLabel2
-            // 
-            this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(39, 24);
-            this.toolStripLabel2.Text = "筛选";
-            // 
-            // toolStripTextBox_Filter
-            // 
-            this.toolStripTextBox_Filter.Name = "toolStripTextBox_Filter";
-            this.toolStripTextBox_Filter.Size = new System.Drawing.Size(50, 27);
-            this.toolStripTextBox_Filter.Text = "*";
+            this.toolStripButton_IncludeSub.Size = new System.Drawing.Size(103, 24);
+            this.toolStripButton_IncludeSub.Text = "包含子文件夹";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
             // 
-            // pluginButtons
+            // toolStripDropDownButton_plugin
             // 
-            this.pluginButtons.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.pluginButtons.Image = ((System.Drawing.Image)(resources.GetObject("pluginButtons.Image")));
-            this.pluginButtons.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.pluginButtons.Name = "pluginButtons";
-            this.pluginButtons.Size = new System.Drawing.Size(53, 24);
-            this.pluginButtons.Text = "任务";
+            this.toolStripDropDownButton_plugin.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton_plugin.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton_plugin.Image")));
+            this.toolStripDropDownButton_plugin.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton_plugin.Name = "toolStripDropDownButton_plugin";
+            this.toolStripDropDownButton_plugin.Size = new System.Drawing.Size(53, 24);
+            this.toolStripDropDownButton_plugin.Text = "任务";
             // 
-            // toolStripButton_Cancel
+            // listView_result
             // 
-            this.toolStripButton_Cancel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton_Cancel.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_Cancel.Image")));
-            this.toolStripButton_Cancel.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton_Cancel.Name = "toolStripButton_Cancel";
-            this.toolStripButton_Cancel.Size = new System.Drawing.Size(81, 24);
-            this.toolStripButton_Cancel.Text = "按Esc取消";
-            this.toolStripButton_Cancel.Visible = false;
-            // 
-            // listView_DirList
-            // 
-            this.listView_DirList.AllowDrop = true;
-            this.listView_DirList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.listView_result.CheckBoxes = true;
+            this.listView_result.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader2});
-            this.listView_DirList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.listView_DirList.FullRowSelect = true;
-            this.listView_DirList.GridLines = true;
-            this.listView_DirList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.listView_DirList.Location = new System.Drawing.Point(3, 30);
-            this.listView_DirList.Name = "listView_DirList";
-            this.listView_DirList.ShowGroups = false;
-            this.listView_DirList.Size = new System.Drawing.Size(394, 528);
-            this.listView_DirList.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.listView_DirList.TabIndex = 2;
-            this.listView_DirList.UseCompatibleStateImageBehavior = false;
-            this.listView_DirList.View = System.Windows.Forms.View.Details;
-            this.listView_DirList.VirtualMode = true;
-            this.listView_DirList.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.OnDirListRetrieveVirtualItem);
-            this.listView_DirList.DragDrop += new System.Windows.Forms.DragEventHandler(this.OnDirListDragDrop);
-            this.listView_DirList.DragEnter += new System.Windows.Forms.DragEventHandler(this.OnDirListDragEnter);
+            this.listView_result.ContextMenuStrip = this.contextMenuStrip_result;
+            this.listView_result.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.listView_result.FullRowSelect = true;
+            this.listView_result.GridLines = true;
+            this.listView_result.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.listView_result.Location = new System.Drawing.Point(0, 27);
+            this.listView_result.Name = "listView_result";
+            this.listView_result.ShowItemToolTips = true;
+            this.listView_result.Size = new System.Drawing.Size(855, 534);
+            this.listView_result.TabIndex = 2;
+            this.listView_result.UseCompatibleStateImageBehavior = false;
+            this.listView_result.View = System.Windows.Forms.View.Details;
+            this.listView_result.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.listView_result_ItemSelectionChanged);
+            this.listView_result.DoubleClick += new System.EventHandler(this.OnResultItemDoubleClick);
             // 
             // columnHeader2
             // 
-            this.columnHeader2.Text = "文件/文件夹列表";
-            this.columnHeader2.Width = 389;
+            this.columnHeader2.Text = "";
+            this.columnHeader2.Width = 840;
             // 
-            // tableLayoutPanel2
+            // contextMenuStrip_result
             // 
-            this.tableLayoutPanel2.ColumnCount = 1;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Controls.Add(this.listView_DupFiles, 0, 1);
-            this.tableLayoutPanel2.Controls.Add(this.toolStrip_File, 0, 0);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 2;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(879, 561);
-            this.tableLayoutPanel2.TabIndex = 4;
+            this.contextMenuStrip_result.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.contextMenuStrip_result.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.copyToolStripMenuItem,
+            this.copyGroupToolStripMenuItem,
+            this.toolStripMenuItem1,
+            this.doToolStripMenuItem});
+            this.contextMenuStrip_result.Name = "contextMenuStrip_result";
+            this.contextMenuStrip_result.Size = new System.Drawing.Size(205, 88);
             // 
-            // toolStrip_File
+            // copyToolStripMenuItem
             // 
-            this.toolStrip_File.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.toolStrip_File.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.toolStrip_File.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton_RemoveFile,
+            this.copyToolStripMenuItem.Name = "copyToolStripMenuItem";
+            this.copyToolStripMenuItem.Size = new System.Drawing.Size(204, 26);
+            this.copyToolStripMenuItem.Text = "复制";
+            this.copyToolStripMenuItem.Click += new System.EventHandler(this.copyToolStripMenuItem_Click);
+            // 
+            // copyGroupToolStripMenuItem
+            // 
+            this.copyGroupToolStripMenuItem.Name = "copyGroupToolStripMenuItem";
+            this.copyGroupToolStripMenuItem.Size = new System.Drawing.Size(204, 26);
+            this.copyGroupToolStripMenuItem.Text = "复制(按组)";
+            this.copyGroupToolStripMenuItem.Click += new System.EventHandler(this.copyGroupToolStripMenuItem_Click);
+            // 
+            // toolStripMenuItem1
+            // 
+            this.toolStripMenuItem1.Name = "toolStripMenuItem1";
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(201, 6);
+            // 
+            // doToolStripMenuItem
+            // 
+            this.doToolStripMenuItem.Name = "doToolStripMenuItem";
+            this.doToolStripMenuItem.Size = new System.Drawing.Size(204, 26);
+            this.doToolStripMenuItem.Text = "对标记项应用插件";
+            this.doToolStripMenuItem.Click += new System.EventHandler(this.doToolStripMenuItem_Click);
+            // 
+            // toolStrip2
+            // 
+            this.toolStrip2.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolStrip2.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripTextBox_filterText,
+            this.toolStripButton_regex,
+            this.toolStripButton_search,
             this.toolStripSeparator2,
-            this.toolStripButton_Clear,
-            this.toolStripSeparator5,
-            this.toolStripButton_Select,
-            this.toolStripSeparator4,
-            this.toolStripButton_ClearCheck,
-            this.toolStripButton_AllCheck,
-            this.toolStripSeparator6,
-            this.toolStripButton_Search,
-            this.toolStripTextBox_Search});
-            this.toolStrip_File.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip_File.Name = "toolStrip_File";
-            this.toolStrip_File.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.toolStrip_File.Size = new System.Drawing.Size(879, 27);
-            this.toolStrip_File.TabIndex = 4;
-            this.toolStrip_File.Text = "toolStrip2";
+            this.toolStripDropDownButton1,
+            this.toolStripButton2,
+            this.toolStripSeparator3,
+            this.toolStripButton_clearResult});
+            this.toolStrip2.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip2.Name = "toolStrip2";
+            this.toolStrip2.Size = new System.Drawing.Size(855, 27);
+            this.toolStrip2.TabIndex = 0;
+            this.toolStrip2.Text = "toolStrip2";
             // 
-            // toolStripButton_RemoveFile
+            // toolStripTextBox_filterText
             // 
-            this.toolStripButton_RemoveFile.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripButton_RemoveFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton_RemoveFile.ForeColor = System.Drawing.Color.Red;
-            this.toolStripButton_RemoveFile.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_RemoveFile.Image")));
-            this.toolStripButton_RemoveFile.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton_RemoveFile.Name = "toolStripButton_RemoveFile";
-            this.toolStripButton_RemoveFile.Size = new System.Drawing.Size(43, 24);
-            this.toolStripButton_RemoveFile.Text = "清理";
-            this.toolStripButton_RemoveFile.Click += new System.EventHandler(this.OnRemoveFileButtonClick);
+            this.toolStripTextBox_filterText.Name = "toolStripTextBox_filterText";
+            this.toolStripTextBox_filterText.Size = new System.Drawing.Size(350, 27);
+            // 
+            // toolStripButton_regex
+            // 
+            this.toolStripButton_regex.CheckOnClick = true;
+            this.toolStripButton_regex.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton_regex.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_regex.Image")));
+            this.toolStripButton_regex.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton_regex.Name = "toolStripButton_regex";
+            this.toolStripButton_regex.Size = new System.Drawing.Size(43, 24);
+            this.toolStripButton_regex.Text = "正则";
+            // 
+            // toolStripButton_search
+            // 
+            this.toolStripButton_search.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton_search.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_search.Image")));
+            this.toolStripButton_search.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton_search.Name = "toolStripButton_search";
+            this.toolStripButton_search.Size = new System.Drawing.Size(43, 24);
+            this.toolStripButton_search.Text = "搜索";
+            this.toolStripButton_search.Click += new System.EventHandler(this.toolStripButton_search_Click);
             // 
             // toolStripSeparator2
             // 
-            this.toolStripSeparator2.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
             // 
-            // toolStripButton_Clear
+            // toolStripDropDownButton1
             // 
-            this.toolStripButton_Clear.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripButton_Clear.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton_Clear.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_Clear.Image")));
-            this.toolStripButton_Clear.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton_Clear.Name = "toolStripButton_Clear";
-            this.toolStripButton_Clear.Size = new System.Drawing.Size(73, 24);
-            this.toolStripButton_Clear.Text = "清空列表";
-            this.toolStripButton_Clear.Click += new System.EventHandler(this.OnClearResultButtonClick);
+            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.selectCheckToolStripMenuItem,
+            this.selectAllToolStripMenuItem,
+            this.invertSelectToolStripMenuItem,
+            this.clearSelectToolStripMenuItem});
+            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
+            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            this.toolStripDropDownButton1.Size = new System.Drawing.Size(53, 24);
+            this.toolStripDropDownButton1.Text = "选择";
             // 
-            // toolStripSeparator5
+            // selectCheckToolStripMenuItem
             // 
-            this.toolStripSeparator5.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 27);
+            this.selectCheckToolStripMenuItem.Name = "selectCheckToolStripMenuItem";
+            this.selectCheckToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.selectCheckToolStripMenuItem.Text = "标记项";
+            this.selectCheckToolStripMenuItem.Click += new System.EventHandler(this.toolStripButton_selectCheck_Click);
             // 
-            // toolStripButton_Select
+            // selectAllToolStripMenuItem
             // 
-            this.toolStripButton_Select.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripButton_Select.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton_Select.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_Select.Image")));
-            this.toolStripButton_Select.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton_Select.Name = "toolStripButton_Select";
-            this.toolStripButton_Select.Size = new System.Drawing.Size(133, 24);
-            this.toolStripButton_Select.Text = "自动标记重复文件";
-            this.toolStripButton_Select.Click += new System.EventHandler(this.OnSelectResultButtonClick);
+            this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.selectAllToolStripMenuItem.Text = "全选";
+            this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
             // 
-            // toolStripSeparator4
+            // toolStripButton2
             // 
-            this.toolStripSeparator4.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 27);
+            this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.checkAllToolStripMenuItem,
+            this.checkAutoToolStripMenuItem,
+            this.invertCheckToolStripMenuItem,
+            this.clearCheckToolStripMenuItem});
+            this.toolStripButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton2.Image")));
+            this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton2.Name = "toolStripButton2";
+            this.toolStripButton2.Size = new System.Drawing.Size(53, 24);
+            this.toolStripButton2.Text = "标记";
             // 
-            // toolStripButton_ClearCheck
+            // checkAllToolStripMenuItem
             // 
-            this.toolStripButton_ClearCheck.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripButton_ClearCheck.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton_ClearCheck.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_ClearCheck.Image")));
-            this.toolStripButton_ClearCheck.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton_ClearCheck.Name = "toolStripButton_ClearCheck";
-            this.toolStripButton_ClearCheck.Size = new System.Drawing.Size(103, 24);
-            this.toolStripButton_ClearCheck.Text = "清除所有标记";
-            this.toolStripButton_ClearCheck.Click += new System.EventHandler(this.OnClearCheckButtonClick);
+            this.checkAllToolStripMenuItem.Name = "checkAllToolStripMenuItem";
+            this.checkAllToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
+            this.checkAllToolStripMenuItem.Text = "全标记";
+            this.checkAllToolStripMenuItem.Click += new System.EventHandler(this.checkAllToolStripMenuItem_Click);
             // 
-            // toolStripButton_AllCheck
+            // checkAutoToolStripMenuItem
             // 
-            this.toolStripButton_AllCheck.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripButton_AllCheck.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton_AllCheck.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_AllCheck.Image")));
-            this.toolStripButton_AllCheck.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton_AllCheck.Name = "toolStripButton_AllCheck";
-            this.toolStripButton_AllCheck.Size = new System.Drawing.Size(58, 24);
-            this.toolStripButton_AllCheck.Text = "全标记";
-            this.toolStripButton_AllCheck.Click += new System.EventHandler(this.OnAllCheckButtonClick);
+            this.checkAutoToolStripMenuItem.Name = "checkAutoToolStripMenuItem";
+            this.checkAutoToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
+            this.checkAutoToolStripMenuItem.Text = "全标记(不标第一个)";
+            this.checkAutoToolStripMenuItem.Click += new System.EventHandler(this.checkAutoToolStripMenuItem_Click);
             // 
-            // toolStripSeparator6
+            // clearCheckToolStripMenuItem
             // 
-            this.toolStripSeparator6.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(6, 27);
+            this.clearCheckToolStripMenuItem.Name = "clearCheckToolStripMenuItem";
+            this.clearCheckToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
+            this.clearCheckToolStripMenuItem.Text = "清空标记";
+            this.clearCheckToolStripMenuItem.Click += new System.EventHandler(this.clearCheckToolStripMenuItem_Click);
             // 
-            // toolStripButton_Search
+            // toolStripSeparator3
             // 
-            this.toolStripButton_Search.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripButton_Search.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripButton_Search.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_Search.Image")));
-            this.toolStripButton_Search.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton_Search.Name = "toolStripButton_Search";
-            this.toolStripButton_Search.Size = new System.Drawing.Size(43, 24);
-            this.toolStripButton_Search.Text = "搜索";
-            this.toolStripButton_Search.Click += new System.EventHandler(this.OnSearchButtonClick);
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 27);
             // 
-            // toolStripTextBox_Search
+            // toolStripButton_clearResult
             // 
-            this.toolStripTextBox_Search.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripTextBox_Search.Name = "toolStripTextBox_Search";
-            this.toolStripTextBox_Search.Size = new System.Drawing.Size(120, 27);
+            this.toolStripButton_clearResult.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripButton_clearResult.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton_clearResult.Image")));
+            this.toolStripButton_clearResult.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripButton_clearResult.Name = "toolStripButton_clearResult";
+            this.toolStripButton_clearResult.Size = new System.Drawing.Size(43, 24);
+            this.toolStripButton_clearResult.Text = "清空";
+            this.toolStripButton_clearResult.Click += new System.EventHandler(this.toolStripButton_clearResult_Click);
             // 
-            // statusStrip
+            // openFileDialog_path
             // 
-            this.statusStrip.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openFileDialog_path.Multiselect = true;
+            this.openFileDialog_path.Title = "添加路径";
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel,
             this.toolStripProgressBar});
-            this.statusStrip.Location = new System.Drawing.Point(0, 561);
-            this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(1281, 22);
-            this.statusStrip.TabIndex = 2;
-            this.statusStrip.Text = "statusStrip1";
+            this.statusStrip1.Location = new System.Drawing.Point(0, 561);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(1281, 22);
+            this.statusStrip1.TabIndex = 1;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel
+            // 
+            this.toolStripStatusLabel.Name = "toolStripStatusLabel";
+            this.toolStripStatusLabel.Size = new System.Drawing.Size(0, 17);
             // 
             // toolStripProgressBar
             // 
             this.toolStripProgressBar.Name = "toolStripProgressBar";
-            this.toolStripProgressBar.Size = new System.Drawing.Size(200, 18);
+            this.toolStripProgressBar.Size = new System.Drawing.Size(100, 16);
             this.toolStripProgressBar.Step = 1;
-            this.toolStripProgressBar.Visible = false;
             // 
-            // folderBrowserDialog
+            // invertSelectToolStripMenuItem
             // 
-            this.folderBrowserDialog.Description = "选择要查找重复文件的文件夹";
-            this.folderBrowserDialog.ShowNewFolderButton = false;
+            this.invertSelectToolStripMenuItem.Name = "invertSelectToolStripMenuItem";
+            this.invertSelectToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.invertSelectToolStripMenuItem.Text = "反选";
+            this.invertSelectToolStripMenuItem.Click += new System.EventHandler(this.invertSelectToolStripMenuItem_Click);
             // 
-            // openFileDialog
+            // invertCheckToolStripMenuItem
             // 
-            this.openFileDialog.FileName = "openFileDialog1";
+            this.invertCheckToolStripMenuItem.Name = "invertCheckToolStripMenuItem";
+            this.invertCheckToolStripMenuItem.Size = new System.Drawing.Size(214, 26);
+            this.invertCheckToolStripMenuItem.Text = "反标记";
+            this.invertCheckToolStripMenuItem.Click += new System.EventHandler(this.invertCheckToolStripMenuItem_Click);
+            // 
+            // clearSelectToolStripMenuItem
+            // 
+            this.clearSelectToolStripMenuItem.Name = "clearSelectToolStripMenuItem";
+            this.clearSelectToolStripMenuItem.Size = new System.Drawing.Size(181, 26);
+            this.clearSelectToolStripMenuItem.Text = "取消选择";
+            this.clearSelectToolStripMenuItem.Click += new System.EventHandler(this.clearSelectToolStripMenuItem_Click);
             // 
             // GUI
             // 
@@ -441,8 +458,8 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.ClientSize = new System.Drawing.Size(1281, 583);
-            this.Controls.Add(this.splitContainer1);
-            this.Controls.Add(this.statusStrip);
+            this.Controls.Add(this.splitContainer);
+            this.Controls.Add(this.statusStrip1);
             this.DoubleBuffered = true;
             this.KeyPreview = true;
             this.MinimumSize = new System.Drawing.Size(1020, 630);
@@ -450,61 +467,68 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "简单测试";
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.OnGUIKeyDown);
-            this.splitContainer1.Panel1.ResumeLayout(false);
-            this.splitContainer1.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
-            this.splitContainer1.ResumeLayout(false);
-            this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel1.PerformLayout();
-            this.toolStrip_Dir.ResumeLayout(false);
-            this.toolStrip_Dir.PerformLayout();
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel2.PerformLayout();
-            this.toolStrip_File.ResumeLayout(false);
-            this.toolStrip_File.PerformLayout();
-            this.statusStrip.ResumeLayout(false);
-            this.statusStrip.PerformLayout();
+            this.splitContainer.Panel1.ResumeLayout(false);
+            this.splitContainer.Panel1.PerformLayout();
+            this.splitContainer.Panel2.ResumeLayout(false);
+            this.splitContainer.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.splitContainer)).EndInit();
+            this.splitContainer.ResumeLayout(false);
+            this.contextMenuStrip_path.ResumeLayout(false);
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
+            this.contextMenuStrip_result.ResumeLayout(false);
+            this.toolStrip2.ResumeLayout(false);
+            this.toolStrip2.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
         }
 
         #endregion
-        private System.Windows.Forms.ListView listView_DupFiles;
-        private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.StatusStrip statusStrip;
-        private System.Windows.Forms.ListView listView_DirList;
-        private System.Windows.Forms.ToolStrip toolStrip_Dir;
-        private System.Windows.Forms.ToolStrip toolStrip_File;
-        private System.Windows.Forms.ToolStripButton toolStripButton_Del;
-        private System.Windows.Forms.ToolStripButton toolStripButton_RemoveFile;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
-        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog;
+
+        private System.Windows.Forms.SplitContainer splitContainer;
+        private System.Windows.Forms.ListView listView_path;
+        private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ToolStripButton toolStripButton_Select;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-        private System.Windows.Forms.ToolStripButton toolStripButton_IncludeSub;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel2;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip_path;
+        private System.Windows.Forms.OpenFileDialog openFileDialog_path;
+        private System.Windows.Forms.ToolStripLabel toolStripLabel1;
         private System.Windows.Forms.ToolStripTextBox toolStripTextBox_Filter;
-        private System.Windows.Forms.ToolStripDropDownButton pluginButtons;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripButton toolStripButton_Clear;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
-        private System.Windows.Forms.ToolStripButton toolStripButton_AllCheck;
-        private System.Windows.Forms.ToolStripButton toolStripButton_ClearCheck;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
-        private System.Windows.Forms.ToolStripTextBox toolStripTextBox_Search;
-        private System.Windows.Forms.ToolStripButton toolStripButton_Search;
-        private System.Windows.Forms.ToolStripButton toolStripButton_Cancel;
+        private System.Windows.Forms.ToolStripButton toolStripButton_IncludeSub;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton_plugin;
+        private System.Windows.Forms.ToolStrip toolStrip2;
+        private System.Windows.Forms.ListView listView_result;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ToolStripMenuItem addToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem removeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearToolStripMenuItem;
+        private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar;
-        private System.Windows.Forms.ToolStripDropDownButton toolStripButton_Add;
-        private System.Windows.Forms.ToolStripMenuItem 文件夹ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 文件ToolStripMenuItem;
-        private System.Windows.Forms.OpenFileDialog openFileDialog;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel;
+        private System.Windows.Forms.ContextMenuStrip contextMenuStrip_result;
+        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem copyToolStripMenuItem;
+        private System.Windows.Forms.ToolStripTextBox toolStripTextBox_filterText;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripButton toolStripButton_clearResult;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripButton2;
+        private System.Windows.Forms.ToolStripMenuItem checkAllToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearCheckToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton toolStripButton_regex;
+        private System.Windows.Forms.ToolStripButton toolStripButton_search;
+        private System.Windows.Forms.ToolStripMenuItem checkAutoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem doToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyGroupToolStripMenuItem;
+        private System.Windows.Forms.ToolStripDropDownButton toolStripDropDownButton1;
+        private System.Windows.Forms.ToolStripMenuItem selectCheckToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem selectAllToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem invertSelectToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem invertCheckToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem clearSelectToolStripMenuItem;
     }
 }
 

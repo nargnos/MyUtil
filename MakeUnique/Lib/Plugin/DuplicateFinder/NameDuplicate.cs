@@ -1,31 +1,45 @@
-﻿using System.Collections.Generic;
+﻿using MakeUnique.Lib.Detail;
+using MakeUnique.Lib.Plugin;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MakeUnique.Lib.Plugin.DuplicateFinder
 {
-    class NameDuplicate : DuplicateFinderBase
+    class NameDuplicate : PluginBase<string>
     {
-        private static string grpName_ = "文件名";
-        protected override string GroupName
+        public const string GrpName = "文件名";
+        public override string Name { get; } = "查找重复 (" + GrpName + ")";
+
+
+        public static string GetFileName(string path)
         {
-            get
+            try
             {
-                return grpName_;
+                return Path.GetFileName(path);
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
 
-        public override ParallelQuery<IGrouping<string, string>> Do(HashSet<string> inputFiles)
+        internal protected override ParallelQuery<IGrouping<string, string>> PluginDo(HashSet<string> files)
         {
-           return (from fileName in inputFiles.AsParallel()
-                   group fileName by GetFileName(fileName) into grp
-                   where grp.Count() > 1
-                   select grp).AsUnordered();
+            return from path in files.AsParallel().AsUnordered()
+                   let fileName = GetFileName(path)
+                   where !string.IsNullOrEmpty(fileName)
+                   group path by fileName into result
+                   where result.Count() > 1
+                   select result;
         }
         
-        protected string GetFileName(string path)
+        internal protected override string GroupNameConvert(string key)
         {
-            return Path.GetFileName(path);
+            return $"{GrpName}: {key}";
         }
     }
 }

@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace DataRowConvert
 {
+    // 注意转换时成员要声明成public
     public static class ConvertorExpression
     {
         // 对应目标的映射关系
-        [AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = false)]
+        [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
         public sealed class ConvertFieldAttribute : Attribute
         {
             readonly string fieldName_;

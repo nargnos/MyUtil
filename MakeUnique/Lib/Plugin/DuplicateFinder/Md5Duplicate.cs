@@ -2,54 +2,69 @@
 using System.Collections.Generic;
 using System.Linq;
 using MakeUnique.Lib.Detail;
+using MakeUnique.Lib.Util;
+using System.ComponentModel.Composition;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Collections.Concurrent;
+using System.Text;
 
 namespace MakeUnique.Lib.Plugin.DuplicateFinder
 {
-    class Md5Duplicate : SizeDuplicate
+    class Md5Duplicate : PluginBase<byte[]>, IEqualityComparer<byte[]>
     {
-        private static string grpName_ = "MD5";
-        protected override string GroupName
+        public const string GrpName = "MD5";
+        public override string Name { get; } = "查找重复 (" + GrpName + ")";
+
+        public byte[] GetMD5(string path)
         {
-            get
+            try
             {
-                return grpName_;
+                return Utils.GetMD5(path);
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
-
-        protected class MD5KeyComparer : EqualityComparer<byte[]>
+        public bool Equals(byte[] x, byte[] y)
         {
-            public override bool Equals(byte[] x, byte[] y)
+            if (x == null && y == null)
             {
-                if (x == null && y == null)
-                {
-                    return true;
-                }
-                else if (x == null || y == null)
-                {
-                    return false;
-                }
-                return x.SequenceEqual(y);
+                return true;
             }
-
-            public override int GetHashCode(byte[] obj)
+            if (x == null || y == null)
             {
-                return obj.Sum((val) => val);
+                return false;
             }
+            return x.SequenceEqual(y);
         }
 
-        
-
-        public override ParallelQuery<IGrouping<string, string>> Do(HashSet<string> inputFiles)
+        public int GetHashCode(byte[] obj)
         {
-            return (from md5Grp in GroupingFiles(inputFiles)
-                     .SelectMany((grp) => grp)
-                     .GroupBy((path) => Utils.GetMD5(path), new MD5KeyComparer())
-                          where md5Grp.Count() > 1
-                          select new GroupingKeyConverter<byte[], string, string>(md5Grp, md5ConvertFunc) as IGrouping<string, string>).AsUnordered();
+            return obj.Sum(val => val);
         }
 
-        private Func<byte[], string> md5ConvertFunc = (md5) =>
-            $"{grpName_}: {BitConverter.ToString(md5).Replace("-", string.Empty)}";
+        private static SizeDuplicate sizeObj_ = new SizeDuplicate();
+
+        internal protected override ParallelQuery<IGrouping<byte[], string>> PluginDo(HashSet<string> files)
+        {
+            var sizeGrp = sizeObj_.PluginDo(files);
+
+            // 按大小分的每个组再按md5分组，再展开
+            return (from grpItem in sizeGrp
+                    select
+                        (from path in grpItem
+                         let md5 = GetMD5(path)
+                         where md5 != null
+                         select new { MD5 = md5, Path = path }).GroupBy(item => item.MD5, item => item.Path, this)).
+                    SelectMany(item => item).Where(grp => grp.Count() > 1);
+        }
+
+        internal protected override string GroupNameConvert(byte[] key)
+        {
+            return $"{GrpName}: {BitConverter.ToString(key)}";
+        }
 
     }
 }

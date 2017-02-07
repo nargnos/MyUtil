@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-namespace MakeUnique.Lib.Detail
+namespace MakeUnique.Lib.Util
 {
     public class Utils
     {
@@ -12,19 +12,15 @@ namespace MakeUnique.Lib.Detail
                 isShowUi ? Microsoft.VisualBasic.FileIO.UIOption.AllDialogs : Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs,
                 isRecycle ? Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin : Microsoft.VisualBasic.FileIO.RecycleOption.DeletePermanently);
         }
-        public static async Task RecycleFile(string path)
+        public static void RecycleFile(string path)
         {
-            await Task.Run(() =>
+            try
             {
-                try
-                {
-                    DeleteFile(path, false, true);
-                }
-                catch
-                {
-
-                }
-            });
+                DeleteFile(path, false, true);
+            }
+            catch
+            {
+            }
         }
         public static long GetFileSize(string path)
         {
@@ -37,6 +33,10 @@ namespace MakeUnique.Lib.Detail
             {
                 return md5.ComputeHash(file);
             }
+        }
+        public static bool IsPathExist(string path)
+        {
+            return (Directory.Exists(path) || File.Exists(path));
         }
     }
 }

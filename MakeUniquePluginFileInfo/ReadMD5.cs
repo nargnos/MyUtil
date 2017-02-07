@@ -1,24 +1,35 @@
 ﻿using MakeUnique.Lib;
 using MakeUnique.Lib.Detail;
+using MakeUnique.Lib.Plugin;
+using MakeUnique.Lib.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 
 namespace MakeUniquePluginFileInfo
 {
     // 引用了不适合的项目而且代码结构不好，只作为文件方式的插件测试所以闲了再调整
-    public class ReadMD5 : IPlugin
+    public class ReadMD5 : PluginBase<string>
     {
-        public string Name
+        public override string Name
         {
             get
             {
                 return "输出文件信息";
             }
         }
+        public override string CommandName
+        {
+            get
+            {
+                return string.Empty;
+            }
+        }
+
 
         class Ui : Form
         {
@@ -63,7 +74,7 @@ namespace MakeUniquePluginFileInfo
 
                 layout.Controls.Add(checkboxLayout, 0, 0);
                 layout.Controls.Add(buttonLayout, 0, 1);
-                
+
                 Controls.Add(layout);
                 ResumeLayout();
             }
@@ -86,19 +97,6 @@ namespace MakeUniquePluginFileInfo
         }
         Lazy<Ui> ui = new Lazy<Ui>(() => new Ui(), true);
 
-        ParallelQuery<IGrouping<string, string>> IPlugin.Do(HashSet<string> inputFiles)
-        {
-            var showOption = ui.Value.ShowDialog();
-            if (showOption == Ui.ShowInfo.None)
-            {
-                return null;
-            }
-            return from path in inputFiles.AsParallel()
-                   let infos = GetFileInfo(showOption, path)
-                   from info in infos
-                   group info by path;
-
-        }
         private IEnumerable<string> GetFileInfo(Ui.ShowInfo option, string path)
         {
             List<string> result = new List<string>();
@@ -109,8 +107,9 @@ namespace MakeUniquePluginFileInfo
             if (HasFlag(Ui.ShowInfo.Size, option))
             {
                 StringBuilder sb = new StringBuilder(32);
-                NativeMethods.StrFormatByteSizeW(Utils.GetFileSize(path), sb, sb.Capacity);
-                result.Add($"Size: {sb.ToString()}");
+                var len = Utils.GetFileSize(path);
+                NativeMethods.StrFormatByteSizeW(len, sb, sb.Capacity);
+                result.Add($"Size: {sb.ToString()} ({len} Bytes)");
             }
             return result;
         }
@@ -119,5 +118,27 @@ namespace MakeUniquePluginFileInfo
         {
             return (flag & val) == flag;
         }
+
+
+        protected override ParallelQuery<IGrouping<string, string>> PluginDo(HashSet<string> files)
+        {
+            var showOption = ui.Value.ShowDialog();
+            if (showOption == Ui.ShowInfo.None)
+            {
+                return null;
+            }
+            return from path in files.AsParallel()
+                   let infos = GetFileInfo(showOption, path)
+                   from info in infos
+                   group info by path;
+
+        }
+
+        protected override string GroupNameConvert(string key)
+        {
+            return key;
+        }
+
+
     }
 }
