@@ -148,8 +148,6 @@ namespace DownloadGithubExe
                         wait.Add(tmpWait);
                         DownloadInfo info = await dm.DownloadFile(item.Addr, path);
                         PrintDownloadComplete(info.Uri);
-                        File.Delete(info.Path);
-                        File.Move(info.TmpPath, info.Path);
                     }
                     catch (Exception e)
                     {

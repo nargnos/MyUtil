@@ -36,7 +36,15 @@ namespace DownloadGithubExe
             var tmpPath = GetTmpPath(path);
             var result = new DownloadInfo(this, uri, path, tmpPath);
             await CreateWeb().DownloadFileTaskAsync(new Uri(uri), tmpPath);
-
+            try
+            {
+                File.Delete(result.Path);
+                File.Move(result.TmpPath, result.Path);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
             return result;
         }
 
