@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataRowConvertTest", "DataR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MakeUniquePluginFileInfo", "MakeUniquePluginFileInfo\MakeUniquePluginFileInfo.csproj", "{FFB1DE34-8401-481F-AE80-96B1749E1D26}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadGithubExe", "DownloadGithubExe\DownloadGithubExe.csproj", "{32959015-D326-48E1-9D71-ABFD50D10340}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{FFB1DE34-8401-481F-AE80-96B1749E1D26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFB1DE34-8401-481F-AE80-96B1749E1D26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFB1DE34-8401-481F-AE80-96B1749E1D26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32959015-D326-48E1-9D71-ABFD50D10340}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32959015-D326-48E1-9D71-ABFD50D10340}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32959015-D326-48E1-9D71-ABFD50D10340}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32959015-D326-48E1-9D71-ABFD50D10340}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
