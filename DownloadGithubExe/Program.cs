@@ -96,12 +96,14 @@ namespace DownloadGithubExe
                     Console.WriteLine();
                     Console.WriteLine("=========这些文件下载失败(保存到download.log)========");
                     var sb = new StringBuilder();
+                    sb.AppendLine("下载失败的文件:");
                     foreach (var item in result)
                     {
                         sb.AppendLine(item);
                         Console.WriteLine(item);
                     }
                     File.WriteAllText("download.log", sb.ToString());
+                    Console.Read();
                 }
 
             }
@@ -134,6 +136,7 @@ namespace DownloadGithubExe
                     if (File.Exists(path))
                     {
                         // FIX: 仅靠检查大小是不行的，还要检查版本号等，以防止多余下载
+                        // 检查文件信息不符就要下载
                         if (new FileInfo(path).Length == item.Size)
                         {
                             return;
