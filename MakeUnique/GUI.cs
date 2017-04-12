@@ -23,43 +23,25 @@ namespace MakeUnique
 {
     // 并不是什么有用的类库，有时候用到这些功能而网上下载的不太满意就弄个
     // 这个界面是用来测试的有点乱
+    [Export(typeof(GUI))]
     public partial class GUI : Form
     {
-        [Import(typeof(IPathManager))]
         private IPathManager pathManager_;
-
-
-        [Import(typeof(IPluginManager))]
         private IPluginManager pluginManager_;
 
         private CancellationTokenSource cancel_ = null;
         private Action do_ = null;
-        public GUI()
+        [ImportingConstructor]
+        public GUI(IPathManager pathManager, IPluginManager pluginManager)
         {
+            pathManager_ = pathManager;
+            pluginManager_ = pluginManager;
             InitializeComponent();
-            InitializePlugin();
             InitializePluginMenu();
             HideProgressBar();
         }
 
-        void InitializePlugin()
-        {
-            try
-            {
-                CatalogHelper.ComposeParts(this);
-                if (pathManager_ != null && pluginManager_ != null)
-                {
-                    return;
-                }
-                throw new ApplicationException("无法初始化");
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(this, e.Message, "插件载入失败");
-            }
-
-            Application.Exit();
-        }
+        
 
         private void InitializePluginMenu()
         {

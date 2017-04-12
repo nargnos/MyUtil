@@ -13,16 +13,5 @@ namespace MakeUnique.Lib.Plugin
     {
         [ImportMany(typeof(IPlugin))]
         public IEnumerable<Lazy<IPlugin>> Plugins { get; private set; }
-
-        PluginManager()
-        {
-            try
-            {
-                CatalogHelper.ComposeParts(this);
-            }
-            catch (Exception)
-            {
-            }
-        }
     }
 }
