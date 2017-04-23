@@ -46,6 +46,7 @@
     <Compile Include="ListAllFiles.cs" />
     <Compile Include="ReadMD5.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WordCount.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MakeUnique\MakeUnique.csproj">
