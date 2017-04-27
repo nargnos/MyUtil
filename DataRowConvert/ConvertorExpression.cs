@@ -27,13 +27,13 @@ namespace DataRowConvert
                 get { return fieldName_; }
             }
         }
-        public static Action<DataRow,TResult> EmitFillRow<TResult>()
+        public static Action<DataRow, TResult> EmitFillRow<TResult>()
         {
             var typeResult = typeof(TResult);
             var typeDataRow = typeof(DataRow);
 
             var row = Expression.Parameter(typeDataRow, "row");
-            var obj = Expression.Parameter(typeResult, "obj");            
+            var obj = Expression.Parameter(typeResult, "obj");
 
             // row.SetField(colName, obj.field)
             var assigns = from property in typeResult.GetProperties()
@@ -57,7 +57,7 @@ namespace DataRowConvert
         {
             var typeResult = typeof(TResult);
             var typeDataRow = typeof(DataRow);
-            
+
             var param = Expression.Parameter(typeDataRow, "row");
             // new TResult()
             var newObj = Expression.New(typeResult);
@@ -79,7 +79,33 @@ namespace DataRowConvert
 
             return Expression.Lambda<Func<DataRow, TResult>>(blocks, param).Compile();
         }
-
+        // 读Reader, 跟其它有冗余，之后在改
+        public static Func<IDataRecord, TResult> EmitDataRecordConvert<TResult>()
+            where TResult : new()
+        {
+            var typeResult = typeof(TResult);
+            var typeRecord = typeof(IDataRecord);
+            var param = Expression.Parameter(typeRecord, "row");
+            var newObj = Expression.New(typeResult);
+            var result = Expression.Variable(typeResult, "ret");
+            var initResult = Expression.Assign(result, newObj);
+            var assigns = from property in typeResult.GetProperties()
+                          let convertFields = GetConvertFieldAttrs(property)
+                          where CheckConvertFieldAttr(convertFields)
+                          let columnName = GetColName(convertFields)
+                          let field = GetProp(result, property)
+                          let fieldValue = GetReaderField(param, columnName, property.PropertyType)
+                          select Expression.Assign(field, fieldValue);
+            var blocks = Expression.Block(
+                new ParameterExpression[] { result },
+                new Expression[] { initResult }.Concat(assigns).Concat(new Expression[] { result }));
+            return Expression.Lambda<Func<IDataRecord, TResult>>(blocks, param).Compile();
+        }
+        private static UnaryExpression GetReaderField(ParameterExpression rec, string columnName, Type valueType)
+        {
+            var prop = Expression.Property(rec, "Item", MakeConstStr(columnName));
+            return Expression.Convert(prop, valueType);
+        }
         private static MethodCallExpression GetRowField(ParameterExpression paramRow, string columnName, Type valueType)
         {
             return Expression.Call(typeof(DataRowExtensions), "Field", new Type[] { valueType }, paramRow, MakeConstStr(columnName));
